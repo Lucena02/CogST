@@ -1,0 +1,22 @@
+body {
+    padding: 0;
+    margin: 0;
+}
+
+.tab {
+    width: 200px;
+    height: 300px;
+    background: rgba(255, 63, 63, 1);
+    display: flex;
+    justify-content: center;
+    border-radius: 10px 0 0 10px;
+}
+
+.leftArrow {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    height: 100%;
+    background: rgb(82, 160, 229);
+    width: 10%;
+}
