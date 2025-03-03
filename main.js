@@ -28,13 +28,30 @@ app.whenReady().then(() => {
 });
 
 
-ipcMain.on("update-window-width", (event, newWidth) => {
-    const { width, height } = screen.getPrimaryDisplay().bounds;
-    if (win) {
-        let { height, y } = win.getBounds();
-        console.log(newWidth)
+ipcMain.on("update-window-width", (event, targetWidth) => {
+    if (!win) return;
 
-        win.setBounds({x: (width-newWidth), y, width: newWidth, height});
-        console.log(`Width resized to: ${newWidth}`);
-    }
+    let { width, height, x, y } = win.getBounds();
+    const step = 2; // Change width by 5px per interval
+    const intervalTime = 20; // Adjust size every 10ms
+
+    // Determine whether we're expanding or shrinking
+    const increasing = width < targetWidth;
+
+    let interval = setInterval(() => {
+        // Gradually adjust the width
+        if (increasing && width < targetWidth) {
+            width = Math.min(width + step, targetWidth);
+        } else if (!increasing && width > targetWidth) {
+            width = Math.max(width - step, targetWidth);
+        } else {
+            clearInterval(interval); // Stop when we reach the target width
+        }
+
+        // Apply the new width
+        win.setBounds({ x, y, width, height });
+
+    }, intervalTime); // Run every 10ms
 });
+
+
