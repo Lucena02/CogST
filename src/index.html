@@ -14,31 +14,37 @@
         <button onclick="resizeWindow()" class="leftArrow" id="seta">
             >
         </button>
-
-        <div class="container" id="content">
-            <div class="header">
-                <div class="cogst">
-                    CogST
+        <div class="container">
+            <div class="container" id="content">
+                <div class="header">
+                    <div class="cogst">
+                        CogST
+                    </div>
+                    <a href="" class="help">
+                        ?
+                    </a>
                 </div>
-                <a href="" class="help">
-                    ?
-                </a>
+                <label>Tarefa a realizar</label>
+                <textarea rows="3" cols="26"></textarea>
+
+                <br>
+
+                <label>Código</label>
+                <textarea rows="1" cols="20"></textarea>
+
+                <br>
+
+                <div>
+                    <button onclick="executeWalkthrough()">Começar</button>
+                </div>
             </div>
-            <label>Tarefa a realizar</label>
-            <textarea rows="3" cols="26"></textarea>
-
-            <br>
-
-            <label>Código</label>
-            <textarea rows="1" cols="20"></textarea>
-
-            <br>
-
-            <div>
-                <button onclick="executeWalkthrough()">Começar</button>
+            <iframe src="qum.html" class="iframe1" frameborder="0" id="iframe1"></iframe>
+            <iframe src="qdois.html" class="iframe2" frameborder="0" id="iframe2"></iframe>
+            <div class="botoes" id="botoes">
+                <button onclick="backWalkthrough()" class="botao">Retroceder</button>
+                <button onclick="executeWalkthrough()" class="botao">Avançar</button>
             </div>
         </div>
-        <iframe src="qum.html" class="iframe1" frameborder="0" id="iframe1"></iframe>
     </div>
     <script src="index.js"></script>
 </body>
