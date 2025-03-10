@@ -1,5 +1,5 @@
 const { app, BrowserWindow, screen, ipcMain } = require("electron");
-require('dotenv').config({path: 'vars.env'});
+require('dotenv').config({ path: 'vars.env' });
 let win;
 
 app.whenReady().then(() => {
@@ -17,41 +17,26 @@ app.whenReady().then(() => {
         resizable: false,
         fullscreenable: false,
         webPreferences: {
-            nodeIntegration: false, 
+            nodeIntegration: false,
             contextIsolation: true,
-            preload: __dirname + "/preload.js", 
+            preload: __dirname + "/src/preload.js",
         }
     });
 
     win.setIgnoreMouseEvents(false); // Allows clicks to pass through
-    win.loadFile("index.html");
+    win.loadFile("src/index.html");
 });
 
 
-ipcMain.on("update-window-width", (event, targetWidth) => {
-    if (!win) return;
+ipcMain.on("update-window-width", (event, newWidth) => {
+    const { width, height } = screen.getPrimaryDisplay().bounds;
+    if (win) {
+        let { height, y } = win.getBounds();
+        console.log(newWidth)
 
-    let { width, height, x, y } = win.getBounds();
-    const step = 2; // Change width by 5px per interval
-    const intervalTime = 20; // Adjust size every 10ms
-
-    // Determine whether we're expanding or shrinking
-    const increasing = width < targetWidth;
-
-    let interval = setInterval(() => {
-        // Gradually adjust the width
-        if (increasing && width < targetWidth) {
-            width = Math.min(width + step, targetWidth);
-        } else if (!increasing && width > targetWidth) {
-            width = Math.max(width - step, targetWidth);
-        } else {
-            clearInterval(interval); // Stop when we reach the target width
-        }
-
-        // Apply the new width
-        win.setBounds({ x, y, width, height });
-
-    }, intervalTime); // Run every 10ms
+        win.setBounds({ x: (width - newWidth), y, width: newWidth, height });
+        console.log(`Width resized to: ${newWidth}`);
+    }
 });
 
 

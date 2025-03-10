@@ -1,0 +1,46 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Overlay</title>
+    <link rel="stylesheet" href="index.css"> <!-- Linking external CSS -->
+
+</head>
+
+<body>
+    <div class="tab">
+        <button onclick="resizeWindow()" class="leftArrow" id="seta">
+            >
+        </button>
+
+        <div class="container" id="content">
+            <div class="header">
+                <div class="cogst">
+                    CogST
+                </div>
+                <a href="" class="help">
+                    ?
+                </a>
+            </div>
+            <label>Tarefa a realizar</label>
+            <textarea rows="3" cols="26"></textarea>
+
+            <br>
+
+            <label>Código</label>
+            <textarea rows="1" cols="20"></textarea>
+
+            <br>
+
+            <div>
+                <button onclick="executeWalkthrough()">Começar</button>
+            </div>
+        </div>
+        <iframe src="qum.html" class="iframe1" frameborder="0" id="iframe1"></iframe>
+    </div>
+    <script src="index.js"></script>
+</body>
+
+</html>

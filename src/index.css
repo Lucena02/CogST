@@ -1,0 +1,103 @@
+@font-face {
+    font-family: 'Roboto';
+    src: url('../public/fonts/Roboto-Bold.ttf');
+    font-weight: bold;
+    font-style: normal;
+}
+
+@font-face {
+    font-family: 'Roboto';
+    src: url('../public/fonts/Roboto-Regular.ttf');
+    font-weight: normal;
+    font-style: normal;
+}
+
+body {
+    padding: 0;
+    margin: 0;
+    overflow: hidden;
+    font-family: 'Roboto';
+}
+
+.tab {
+    width: var(--tab-width);
+    height: var(--tab-height);
+    background: rgb(230, 230, 230);
+    display: flex;
+    border-radius: 12px 0 0 12px;
+    border: 1px solid #000000;
+}
+
+.leftArrow {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    height: 100%;
+    background: rgb(226, 226, 226);
+    width: 10%;
+    border-radius: 10px 0 0 10px;
+}
+
+.container {
+    display: flex;
+    align-items: center;
+    flex-direction: column;
+    width: 100%;
+}
+
+.pergunta {
+    width: 70%;
+    word-wrap: break-word;
+}
+
+.formulario {
+    display: flex;
+    align-items: center;
+    flex-direction: column;
+}
+
+.header {
+    margin-top: 4px;
+    display: flex;
+    justify-content: center;
+    width: 96%;
+    position: relative;
+}
+
+.help {
+    position: absolute;
+    top: 0;
+    right: 0;
+    width: 20px;
+    height: 20px;
+    background-color: #b3b3b3;
+    border-radius: 50%;
+    font-weight: bold;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    text-decoration: none;
+}
+
+.help:hover {
+    background-color: #ff9292;
+}
+
+.cogst {
+    font-size: 18px;
+    font-family: 'Roboto';
+    font-weight: bold;
+}
+
+.iframe1 {
+    display: none;
+    width: 90%;
+    height: 100%;
+}
+
+.severidade {
+    display: none;
+    align-items: center;
+    flex-direction: column;
+    width: 100%;
+}

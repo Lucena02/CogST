@@ -1,0 +1,60 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Overlay</title>
+    <link rel="stylesheet" href="index.css"> <!-- Linking external CSS -->
+
+</head>
+
+<body>
+
+
+    <form class="formulario">
+        <div class="header">
+            <div class="cogst">
+                CogST
+            </div>
+            <a href="" class="help">
+                ?
+            </a>
+        </div>
+        <div class="pergunta">
+            O utilizador vai tentar executar a ação correta?
+        </div>
+
+        <br>
+
+        <label>Problema?</label>
+        <div>
+            <label>Não</label>
+            <input type="radio" value="Não" name="problema">
+            <label>|</label>
+            <input type="radio" value="Sim" name="problema">
+            <label>Sim</label>
+        </div>
+
+        <br>
+
+        <div class="severidade" id="severidade">
+            <label>Gravidade</label>
+            <select>
+                <option>Muito Pequena</option>
+                <option>Pequena</option>
+                <option>Normal</option>
+                <option>Grave</option>
+                <option>Muito Grave</option>
+            </select>
+        </div>
+
+        <br>
+        <label>Comentários</label>
+        <textarea rows="4" cols="26"></textarea>
+
+    </form>
+    <script src="qum.js"></script>
+</body>
+
+</html>
