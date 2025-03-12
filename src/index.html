@@ -6,7 +6,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Overlay</title>
     <link rel="stylesheet" href="index.css"> <!-- Linking external CSS -->
-
+    <script src="https://apis.google.com/js/api.js"></script>
 </head>
 
 <body>
@@ -24,14 +24,15 @@
                         ?
                     </a>
                 </div>
-                <label>Tarefa a realizar</label>
-                <textarea rows="3" cols="26"></textarea>
+                <form style="display: flex; flex-direction: column; align-items: center;" id="form-inicio">
+                    <label>Tarefa a realizar</label>
+                    <textarea id="tarefa" rows="3" cols="26"></textarea>
 
-                <br>
+                    <br>
 
-                <label>Código</label>
-                <textarea rows="1" cols="20"></textarea>
-
+                    <label>Google Sheets Link</label>
+                    <textarea id="google-link" rows="1" cols="20"></textarea>
+                </form>
                 <br>
 
                 <div>

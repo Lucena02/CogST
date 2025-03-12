@@ -1,3 +1,6 @@
+
+import { writeStats } from "./sheets";
+
 // Set global CSS variables dynamically
 document.documentElement.style.setProperty('--tab-width', '298px');
 document.documentElement.style.setProperty('--tab-height', '398px');
@@ -43,23 +46,27 @@ function collectFormData() {
     const iframe4 = document.getElementById("iframe4").contentWindow.document;
 
     // Function to extract values from each iframe form
-    function getFormData(iframeDoc, formId) {
-        const form = iframeDoc.getElementById(formId);
-        if (!form) return {}; // Ensure form exists
-
+    function getFormData(iframeDoc) {
         return {
-            problema: form.querySelector('input[name="problema"]:checked')?.value || "No selection",
-            severidade: form.querySelector("select")?.value || "Not selected",
-            comentarios: form.querySelector("textarea")?.value || "No comments"
+            problema: iframeDoc.getElementById("problema-sim")?.checked ? iframeDoc.getElementById("problema-sim").value :
+                iframeDoc.getElementById("problema-nao")?.checked ? iframeDoc.getElementById("problema-nao").value :
+                    "No selection",
+            severidade: iframeDoc.getElementById("gravidade")?.value || "Not selected",
+            comentarios: iframeDoc.getElementById("comentarios")?.value || "No comments"
         };
     }
 
+
     // Collect data from each form
     const data = {
-        qum: getFormData(iframe1, "forms-um"),
-        qdois: getFormData(iframe2, "forms-dois"),
-        qtres: getFormData(iframe3, "forms-tres"),
-        qquatro: getFormData(iframe4, "forms-quatro")
+        inicio: {
+            tarefa: document.getElementById('tarefa').value,
+            googleLink: document.getElementById('google-link').value
+        },
+        qum: getFormData(iframe1),
+        qdois: getFormData(iframe2),
+        qtres: getFormData(iframe3),
+        qquatro: getFormData(iframe4)
     };
 
     console.log("Collected Form Data:", data);
@@ -147,8 +154,3 @@ function backWalkthrough() {
     }
 }
 
-
-
-function getData() {
-
-}

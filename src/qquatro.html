@@ -29,9 +29,9 @@
 
         <div>
             <label>Não</label>
-            <input type="radio" value="Não" name="problema">
+            <input type="radio" value="Não" name="problema" id="problema-nao">
             <label>|</label>
-            <input type="radio" value="Sim" name="problema">
+            <input type="radio" value="Sim" name="problema" id="problema-sim">
             <label>Sim</label>
         </div>
 
@@ -39,7 +39,7 @@
 
         <div class="severidade" id="severidade">
             <label>Gravidade</label>
-            <select>
+            <select id="gravidade">
                 <option>-</option>
                 <option>Muito Pequena</option>
                 <option>Pequena</option>
@@ -51,7 +51,7 @@
 
         <br>
         <label>Comentários</label>
-        <textarea rows="4" cols="26"></textarea>
+        <textarea id="comentarios" rows="4" cols="26"></textarea>
         <br>
     </form>
     <script src="index.js"></script>
