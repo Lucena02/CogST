@@ -102,6 +102,18 @@ body {
     height: 75%;
 }
 
+.iframe3 {
+    display: none;
+    width: 90%;
+    height: 75%;
+}
+
+.iframe4 {
+    display: none;
+    width: 90%;
+    height: 75%;
+}
+
 .severidade {
     display: none;
     align-items: center;

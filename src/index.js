@@ -34,6 +34,41 @@ function resizeWindow() {
     }
 }
 
+
+function collectFormData() {
+    // Get the iframes
+    const iframe1 = document.getElementById("iframe1").contentWindow.document;
+    const iframe2 = document.getElementById("iframe2").contentWindow.document;
+    const iframe3 = document.getElementById("iframe3").contentWindow.document;
+    const iframe4 = document.getElementById("iframe4").contentWindow.document;
+
+    // Function to extract values from each iframe form
+    function getFormData(iframeDoc, formId) {
+        const form = iframeDoc.getElementById(formId);
+        if (!form) return {}; // Ensure form exists
+
+        return {
+            problema: form.querySelector('input[name="problema"]:checked')?.value || "No selection",
+            severidade: form.querySelector("select")?.value || "Not selected",
+            comentarios: form.querySelector("textarea")?.value || "No comments"
+        };
+    }
+
+    // Collect data from each form
+    const data = {
+        qum: getFormData(iframe1, "forms-um"),
+        qdois: getFormData(iframe2, "forms-dois"),
+        qtres: getFormData(iframe3, "forms-tres"),
+        qquatro: getFormData(iframe4, "forms-quatro")
+    };
+
+    console.log("Collected Form Data:", data);
+
+    // Example: Show in an alert or send to a server
+    alert(JSON.stringify(data, null, 2));
+}
+
+
 let state = 0
 
 function executeWalkthrough() {
@@ -42,6 +77,9 @@ function executeWalkthrough() {
     const botoes = document.getElementById("botoes")
     const iframe1 = document.getElementById("iframe1")
     const iframe2 = document.getElementById("iframe2")
+    const iframe3 = document.getElementById("iframe3")
+    const iframe4 = document.getElementById("iframe4")
+    const avançar = document.getElementById("avançar")
 
     if (state == 0) {
         state = 1
@@ -54,6 +92,23 @@ function executeWalkthrough() {
         iframe1.style.display = "none"
         iframe2.style.display = "flex"
     }
+    else if (state == 2) {
+        state = 3
+        iframe2.style.display = "none"
+        iframe3.style.display = "flex"
+    }
+    else if (state == 3) {
+        state = 4
+        iframe3.style.display = "none"
+        iframe4.style.display = "flex"
+        avançar.innerHTML = "Acabar";
+    }
+    else if (state == 4) {
+        state = 5
+        iframe4.style.display = "none"
+        collectFormData()
+        //iframe2.style.display = "flex"
+    }
     console.log(state)
 }
 
@@ -63,6 +118,9 @@ function backWalkthrough() {
     const iframe1 = document.getElementById("iframe1")
     const botoes = document.getElementById("botoes")
     const iframe2 = document.getElementById("iframe2")
+    const iframe3 = document.getElementById("iframe3")
+    const iframe4 = document.getElementById("iframe4")
+    const avançar = document.getElementById("avançar")
 
     if (state == 1) {
         state = 0
@@ -76,7 +134,21 @@ function backWalkthrough() {
         iframe1.style.display = "flex"
         iframe2.style.display = "none"
     }
+    if (state == 3) {
+        state = 2
+        iframe2.style.display = "flex"
+        iframe3.style.display = "none"
+    }
+    if (state == 4) {
+        state = 3
+        iframe3.style.display = "flex"
+        iframe4.style.display = "none"
+        avançar.innerHTML = "Avançar";
+    }
 }
 
 
 
+function getData() {
+
+}

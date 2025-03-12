@@ -15,3 +15,7 @@ function checkProblema() {
         severidade.style.display = "none"
     }
 }
+
+
+
+
