@@ -1,6 +1,4 @@
 
-import { writeStats } from "./sheets";
-
 // Set global CSS variables dynamically
 document.documentElement.style.setProperty('--tab-width', '298px');
 document.documentElement.style.setProperty('--tab-height', '398px');
@@ -19,9 +17,6 @@ function resizeWindow() {
         if (state == 0) {
             content.style.display = "none";
         }
-        if (state == 1) {
-            iframe1.style.display = "none";
-        }
     }
     else {
         document.documentElement.style.setProperty('--tab-width', '298px');
@@ -30,10 +25,6 @@ function resizeWindow() {
         if (state == 0) {
             content.style.display = "flex";
         }
-        if (state == 1) {
-            iframe1.style.display = "flex";
-        }
-
     }
 }
 
@@ -73,6 +64,8 @@ function collectFormData() {
 
     // Example: Show in an alert or send to a server
     alert(JSON.stringify(data, null, 2));
+    writeStats(data.inicio.googleLink)
+
 }
 
 
@@ -154,3 +147,59 @@ function backWalkthrough() {
     }
 }
 
+
+
+const API_KEY = window.env.SHEET_API_KEY;
+
+function writeStats(url) {
+    const regex = /\/\w+\//g;
+    const matches = url.match(regex);
+    const sheet_id = matches[1].slice(1, -1);
+
+    createNewSheet(sheet_id)
+}
+
+
+
+
+function createNewSheet(sheet_id) {
+    let request = {
+        requests: [
+            {
+                addSheet: {
+                    properties: {
+                        title: "Info1"
+                    }
+                }
+            }
+        ]
+    };
+
+    fetch(`https://sheets.googleapis.com/v4/spreadsheets/${sheet_id}:batchUpdate?key=${API_KEY}`, {
+        method: "POST",
+        headers: {
+            "Content-Type": "application/json"
+        },
+        body: JSON.stringify(request)
+    })
+        .then(response => response.json())
+        .then(data => alert("New sheet created!" + JSON.stringify(data, null, 2)))
+        .catch(error => alert("Error:", error));
+
+    fetch(`https://sheets.googleapis.com/v4/spreadsheets/${sheet_id}?key=${API_KEY}`)
+        .then(response => response.json())
+        .then(data => {
+            console.log("Full API Response:", data); // Log everything
+            if (data.sheets) {
+                alert("Sheet Info: " + JSON.stringify(data.sheets, null, 2)); // Show sheet details
+            } else if (data.error) {
+                console.error("API Error:", data.error);
+                alert("API Error: " + JSON.stringify(data.error, null, 2));
+            } else {
+                console.warn("Unexpected API Response:", data);
+                alert("Unexpected response: " + JSON.stringify(data, null, 2));
+            }
+        })
+        .catch(error => console.error("Network Error:", error));
+
+}

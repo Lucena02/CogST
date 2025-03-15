@@ -1,5 +1,6 @@
 const { app, BrowserWindow, screen, ipcMain } = require("electron");
 require('dotenv').config({ path: 'vars.env' });
+require('dotenv').config({ path: 'priv.env' });
 let win;
 
 app.whenReady().then(() => {
@@ -38,5 +39,7 @@ ipcMain.on("update-window-width", (event, newWidth) => {
         console.log(`Width resized to: ${newWidth}`);
     }
 });
+
+
 
 

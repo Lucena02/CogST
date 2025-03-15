@@ -3,6 +3,7 @@ const { contextBridge, ipcRenderer } = require("electron");
 contextBridge.exposeInMainWorld("env", {
     WIDTH: process.env.WIDTH,
     HEIGHT: process.env.HEIGHT,
+    SHEET_API_KEY: process.env.SHEET_API_KEY
 });
 
 
