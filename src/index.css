@@ -134,3 +134,8 @@ body {
 textarea {
     resize: none;
 }
+
+
+.error {
+    color: rgb(255, 100, 100)
+}

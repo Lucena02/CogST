@@ -1,8 +1,11 @@
-const { app, BrowserWindow, screen, ipcMain } = require("electron");
+const { app, BrowserWindow, screen, ipcMain, dialog, clipboard } = require("electron");
 require('dotenv').config({ path: 'vars.env' });
 require('dotenv').config({ path: 'priv.env' });
-let win;
+const { google } = require("googleapis");
+const express = require("express");
 
+
+let win;
 app.whenReady().then(() => {
     const { width, height } = screen.getPrimaryDisplay().bounds;
     console.log(parseInt(process.env.WIDTH));
@@ -26,7 +29,19 @@ app.whenReady().then(() => {
 
     win.setIgnoreMouseEvents(false); // Allows clicks to pass through
     win.loadFile("src/index.html");
+
+
+
 });
+
+
+//app.whenReady().then();
+
+ipcMain.on("login", (event) => {
+    authenticateUser();
+});
+
+
 
 
 ipcMain.on("update-window-width", (event, newWidth) => {
@@ -43,3 +58,50 @@ ipcMain.on("update-window-width", (event, newWidth) => {
 
 
 
+
+const CLIENT_ID = process.env.ID_CLIENTE;
+const CLIENT_SECRET = process.env.SECRET_CLIENTE;
+const REDIRECT_URI = "http://localhost:3000";
+const SCOPES = ["https://www.googleapis.com/auth/spreadsheets"];
+
+const oauth2Client = new google.auth.OAuth2(
+    CLIENT_ID,
+    CLIENT_SECRET,
+    REDIRECT_URI
+);
+
+async function authenticateUser() {
+    const authUrl = oauth2Client.generateAuthUrl({
+        access_type: "offline",
+        scope: SCOPES,
+    });
+
+    let win = new BrowserWindow({ width: 800, height: 600 });
+    win.loadURL(authUrl);
+}
+
+
+// Create an Express server to handle OAuth 2.0 redirect
+const app2 = express();
+app2.get('/', async (req, res) => {
+    const code = req.query.code;
+    if (code) {
+        try {
+            const { tokens } = await oauth2Client.getToken(code);
+            oauth2Client.setCredentials(tokens);
+            console.log("Authenticated successfully!", tokens);
+            res.send('Authentication Successful!');
+            console.log(tokens['access_token'])
+            win.webContents.send("access-token", tokens['access_token']);
+            dialog.showMessageBox({ type: "info", message: "Authentication Successful!" });
+        } catch (error) {
+            console.error("Error obtaining token:", error);
+            res.send('Authentication Failed!');
+            dialog.showMessageBox({ type: "error", message: "Authentication Failed!" });
+        }
+    }
+});
+
+app2.listen(3000, () => {
+    console.log('Listening on http://localhost:3000');
+});

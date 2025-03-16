@@ -13,6 +13,8 @@
     "electron": "^34.3.0"
   },
   "dependencies": {
-    "dotenv": "^16.4.7"
+    "dotenv": "^16.4.7",
+    "express": "^4.21.2",
+    "googleapis": "^146.0.0"
   }
 }

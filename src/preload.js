@@ -8,9 +8,22 @@ contextBridge.exposeInMainWorld("env", {
 
 
 contextBridge.exposeInMainWorld("electronAPI", {
+    onAccessToken: (callback) => ipcRenderer.on('access-token', callback),
+    doLogin: () => ipcRenderer.send("login"),
     updateWindowSize: (width) => ipcRenderer.send("update-window-width", width),
     getEnv: () => ({
         WIDTH: process.env.WIDTH,
         HEIGHT: process.env.HEIGHT
     })
+});
+
+
+
+ipcRenderer.on('access-token', (event, accessToken) => {
+
+    if (accessToken) {
+        window.localStorage.setItem('access_token', accessToken);
+    } else {
+        alert('No access token received');
+    }
 });
