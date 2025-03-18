@@ -61,11 +61,8 @@ function collectFormData() {
         qquatro: getFormData(iframe4)
     };
 
-    console.log("Collected Form Data:", data);
-
-    // Example: Show in an alert or send to a server
     alert(JSON.stringify(data, null, 2));
-    writeStats(data.inicio.googleLink)
+    writeStats(data, data.inicio.googleLink)
 
 }
 
@@ -153,27 +150,31 @@ function backWalkthrough() {
 
 const API_KEY = window.env.SHEET_API_KEY;
 
-function writeStats(url) {
+function writeStats(data, url) {
     const regex = /\/\w+\//g;
     const matches = url.match(regex);
     const sheet_id = matches[1].slice(1, -1);
 
     createNewSheet(sheet_id)
+    fillSheet(data, sheet_id)
 }
 
 
+
 function createNewSheet(sheet_id) {
-    let request = {
-        requests: [
-            {
-                addSheet: {
-                    properties: {
-                        title: "Info1"
+    let userName = localStorage.getItem('nome_user');
+        
+        let request = {
+            requests: [
+                {
+                    addSheet: {
+                        properties: {
+                            title: userName
+                        }
                     }
                 }
-            }
-        ]
-    };
+            ]
+        };
     let accessToken = localStorage.getItem("access_token");
     fetch(`https://sheets.googleapis.com/v4/spreadsheets/${sheet_id}:batchUpdate?key=${API_KEY}`, {
         method: "POST",
@@ -188,10 +189,45 @@ function createNewSheet(sheet_id) {
         .catch(error => alert("Error:", error));
 }
 
-alert(localStorage.getItem("access_token"))
-if (localStorage.getItem("access_token") != null) {
-    document.getElementById("login").innerHTML = "Logout";
+
+
+function fillSheet(infos, url) {
+    const dataa = [
+        [
+            "O utilizador vai tentar executar a ação correta?\n\n", // Primeira frase com espaçamento
+            "O utilizador percebe que a ação correta está disponível?\n\n", // Segunda frase com espaçamento
+            "O utilizador associará a ação correta com o resultado esperado?\n\n", // Terceira frase com espaçamento
+            "O utilizador receberá feedback adequado e perceberá que está a avançar na sua tarefa?\n\n" // Quarta frase com espaçamento
+        ]
+    ];
+
+    const request = {
+        values: dataa
+    };
+
+    const accessToken = localStorage.getItem("access_token");
+
+    // Fazer a requisição para preencher a planilha com os dados
+    fetch(`https://sheets.googleapis.com/v4/spreadsheets/${url}/values/A1:D1?valueInputOption=RAW`, {
+        method: "PUT",
+        headers: {
+            "Authorization": `Bearer ${accessToken}`,
+            "Content-Type": "application/json"
+        },
+        body: JSON.stringify(request)
+    })
+    .then(response => response.json())
+    .then(data => {
+        alert("Planilha preenchida com sucesso!");
+    })
+    .catch(error => {
+        alert("Erro ao preencher a planilha: " + error);
+    });
 }
+
+
+
+// Logica do Login
 
 function login() {
     if (localStorage.getItem("access_token") == null) {
@@ -199,12 +235,17 @@ function login() {
         document.getElementById("error").innerHTML = ""
     }
     else {
-        alert("FIZ LOGOUT")
         document.getElementById("login").innerHTML = "Login";
         localStorage.clear()
     }
 }
 
+// Para mudar o botao para Logout caso haja uma token valida
+if (localStorage.getItem("access_token") != null) {
+    document.getElementById("login").innerHTML = "Logout";
+}
+
+// Para verificar se de facto alguem fez login
 window.electronAPI.onAccessToken((event, accessToken) => {
     const statusElement = document.getElementById('login');
     if (accessToken) {

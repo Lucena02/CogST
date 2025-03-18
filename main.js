@@ -62,7 +62,12 @@ ipcMain.on("update-window-width", (event, newWidth) => {
 const CLIENT_ID = process.env.ID_CLIENTE;
 const CLIENT_SECRET = process.env.SECRET_CLIENTE;
 const REDIRECT_URI = "http://localhost:3000";
-const SCOPES = ["https://www.googleapis.com/auth/spreadsheets"];
+const SCOPES = [
+    "openid",    
+    "profile",        
+    "email",            
+    "https://www.googleapis.com/auth/spreadsheets"
+];
 
 const oauth2Client = new google.auth.OAuth2(
     CLIENT_ID,
