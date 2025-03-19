@@ -85,6 +85,7 @@ function executeWalkthrough() {
         botoes.style.display = "flex"
         inicio.style.display = "none"
         iframe1.style.display = "flex"
+        loadGapiWithAuth(localStorage.getItem('access_token'))
     }
     else if (state == 1) {
         state = 2
@@ -149,22 +150,24 @@ function backWalkthrough() {
 
 
 const API_KEY = window.env.SHEET_API_KEY;
-
 function writeStats(data, url) {
     const regex = /\/\w+\//g;
     const matches = url.match(regex);
     const sheet_id = matches[1].slice(1, -1);
 
-    createNewSheet(sheet_id)
-    fillSheet(data, sheet_id)
+    createNewSheet(sheet_id).then(() => {
+        fillSheet(data, sheet_id);
+    }).catch(error => {
+        console.error("Error creating sheet:", error);
+    });
 }
 
+function createNewSheet(sheetId) {
+    return new Promise((resolve, reject) => {
+        let userName = localStorage.getItem('nome_user');
 
-
-function createNewSheet(sheet_id) {
-    let userName = localStorage.getItem('nome_user');
-        
-        let request = {
+        gapi.client.sheets.spreadsheets.batchUpdate({
+            spreadsheetId: sheetId,
             requests: [
                 {
                     addSheet: {
@@ -174,56 +177,169 @@ function createNewSheet(sheet_id) {
                     }
                 }
             ]
-        };
-    let accessToken = localStorage.getItem("access_token");
-    fetch(`https://sheets.googleapis.com/v4/spreadsheets/${sheet_id}:batchUpdate?key=${API_KEY}`, {
-        method: "POST",
-        headers: {
-            "Content-Type": "application/json",
-            "Authorization": `Bearer ${accessToken}`
-        },
-        body: JSON.stringify(request)
-    })
-        .then(response => response.json())
-        .then(data => alert("New sheet created!" + JSON.stringify(data, null, 2)))
-        .catch(error => alert("Error:", error));
+        }).then((response) => {
+            if (response.result.replies) {
+                alert("New sheet created!", response);
+                resolve(userName); // Retorna o nome da aba criada
+            } else {
+                alert("Erro")
+                reject("Sheet creation failed");
+            }
+        }).catch(error => {
+            alert("Error:" + JSON.stringify(error));
+            reject(error);
+        });
+    });
 }
 
 
-
-function fillSheet(infos, url) {
-    const dataa = [
+function fillSheet(data, spreadsheetId) {
+    const sheetName = localStorage.getItem('nome_user'); // Get the sheet name
+    const range = `${sheetName}!B1:E1`;
+    const valueInputOption = "RAW";
+    
+    const values = [
         [
-            "O utilizador vai tentar executar a ação correta?\n\n", // Primeira frase com espaçamento
-            "O utilizador percebe que a ação correta está disponível?\n\n", // Segunda frase com espaçamento
-            "O utilizador associará a ação correta com o resultado esperado?\n\n", // Terceira frase com espaçamento
-            "O utilizador receberá feedback adequado e perceberá que está a avançar na sua tarefa?\n\n" // Quarta frase com espaçamento
+            "O utilizador vai \ntentar executar a \nação correta?",
+            "O utilizador percebe \nque a ação correta \nestá disponível?",
+            "O utilizador associará\n a ação correta com\n o resultado esperado?",
+            "O utilizador receberá\n feedback adequado e\n perceberá que está\n a avançar na sua tarefa?"
         ]
     ];
 
-    const request = {
-        values: dataa
-    };
+    const body = { values: values };
 
-    const accessToken = localStorage.getItem("access_token");
-
-    // Fazer a requisição para preencher a planilha com os dados
-    fetch(`https://sheets.googleapis.com/v4/spreadsheets/${url}/values/A1:D1?valueInputOption=RAW`, {
-        method: "PUT",
-        headers: {
-            "Authorization": `Bearer ${accessToken}`,
-            "Content-Type": "application/json"
-        },
-        body: JSON.stringify(request)
-    })
-    .then(response => response.json())
-    .then(data => {
-        alert("Planilha preenchida com sucesso!");
-    })
-    .catch(error => {
-        alert("Erro ao preencher a planilha: " + error);
+    // First, update cell values
+    gapi.client.sheets.spreadsheets.values.update({
+        spreadsheetId: spreadsheetId,
+        range: range,
+        valueInputOption: valueInputOption,
+        resource: body,
+    }).then((response) => {
+        console.log(`${response.result.updatedCells} cells updated.`);
+        
+        // Now, update background color, text formatting, and column width
+        applyFormatting(spreadsheetId, sheetName);
+        
+    }).catch(error => {
+        alert("Erro ao preencher a planilha:" + JSON.stringify(error));
     });
 }
+
+// Function to apply formatting (background color + text alignment + column width)
+function applyFormatting(spreadsheetId, sheetName) {
+    gapi.client.sheets.spreadsheets.get({ spreadsheetId: spreadsheetId }).then((response) => {
+        const sheetId = response.result.sheets.find(sheet => sheet.properties.title === sheetName).properties.sheetId;
+
+        const requests = [
+            {
+                repeatCell: {
+                    range: {
+                        sheetId: sheetId,
+                        startRowIndex: 0, // First row
+                        endRowIndex: 1,
+                        startColumnIndex: 1, // Column B
+                        endColumnIndex: 5   // Column E
+                    },
+                    cell: {
+                        userEnteredFormat: {
+                            backgroundColor: { red: 0.88, green: 0.88, blue: 0.88 }, // Light Gray (#E0E0E0)
+                            horizontalAlignment: "CENTER",
+                            textFormat: { bold: true }
+                        }
+                    },
+                    fields: "userEnteredFormat(backgroundColor,textFormat,horizontalAlignment)"
+                }
+            },
+            // Set column width for B to E
+            {
+                updateDimensionProperties: {
+                    range: {
+                        sheetId: sheetId,
+                        dimension: "COLUMNS",
+                        startIndex: 1, // Column B
+                        endIndex: 5    // Column E
+                    },
+                    properties: {
+                        pixelSize: 250 // Adjust the column width (increase this value for wider columns)
+                    },
+                    fields: "pixelSize"
+                }
+            }
+        ];
+
+        return gapi.client.sheets.spreadsheets.batchUpdate({
+            spreadsheetId: spreadsheetId,
+            resource: { requests: requests }
+        });
+
+    }).then((response) => {
+        console.log("Formatting applied successfully:", response);
+    }).catch(error => {
+        console.error("Error applying formatting:", error);
+    });
+}
+
+
+function applyFormattingRed(spreadsheetId, sheetName, startRow, endRow, startCol, endCol) {
+    gapi.client.sheets.spreadsheets.get({ spreadsheetId: spreadsheetId }).then((response) => {
+        const sheetId = response.result.sheets.find(sheet => sheet.properties.title === sheetName).properties.sheetId;
+
+        const requests = [
+            {
+                repeatCell: {
+                    range: {
+                        sheetId: sheetId,
+                        startRowIndex: startRow, 
+                        endRowIndex: endRow,
+                        startColumnIndex: startCol, 
+                        endColumnIndex: endCol
+                    },
+                    cell: {
+                        userEnteredFormat: {
+                            backgroundColor: { red: 0.88, green: 0.0, blue: 0.0 }, 
+                            horizontalAlignment: "CENTER"
+                        }
+                    },
+                    fields: "userEnteredFormat(backgroundColor,horizontalAlignment)"
+                }
+            }
+        ];
+
+        return gapi.client.sheets.spreadsheets.batchUpdate({
+            spreadsheetId: spreadsheetId,
+            resource: { requests: requests }
+        });
+
+    }).then((response) => {
+        console.log("Formatting applied successfully:", response);
+    }).catch(error => {
+        console.error("Error applying formatting:", error);
+    });
+}
+
+
+
+
+
+
+
+// GAPI
+function loadGapiWithAuth(accessToken) {
+    gapi.load("client", () => {
+        gapi.client.init({
+            apiKey: API_KEY,
+            discoveryDocs: ["https://sheets.googleapis.com/$discovery/rest?version=v4"]
+        }).then(() => {
+            gapi.client.setToken({ access_token: accessToken }); // ✅ Set access token
+            console.log("GAPI Loaded & Authenticated!");
+        }).catch(error => {
+            console.log("Error initializing GAPI:", error);
+        });
+    });
+}
+
+
 
 
 
