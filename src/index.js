@@ -7,7 +7,7 @@ let flag = 0;
 
 
 function resizeWindow() {
-    const content = document.getElementById("content");
+    const content = document.getElementById("contentA");
     let seta = document.getElementById("seta");
     let tabWidth = getComputedStyle(document.documentElement).getPropertyValue('--tab-width').trim();
 
@@ -15,17 +15,15 @@ function resizeWindow() {
         document.documentElement.style.setProperty('--tab-width', '16px');
         window.electronAPI.updateWindowSize(16);
         seta.innerHTML = "<";
-        if (state == 0) {
-            content.style.display = "none";
-        }
+        content.style.display = "none";
+        
     }
     else {
         document.documentElement.style.setProperty('--tab-width', '298px');
         window.electronAPI.updateWindowSize(300);
         seta.innerHTML = ">";
-        if (state == 0) {
-            content.style.display = "flex";
-        }
+        content.style.display = "flex";
+        
     }
 }
 
@@ -74,7 +72,6 @@ function putIframe(frame, passo) {
     div.src = ["qum", "qdois", "qtres", "qquatro"][frame-1] + ".html";
 
     container.appendChild(div);
-    passoIndex += 1
 }
 
 
@@ -151,10 +148,10 @@ function executeWalkthrough(indexPasso) {
         // Colocar botoes
         if (!(document.getElementById("botoes"+indexPasso))){
             const div = document.createElement('div');
-            div.class = "botoes"
+            div.className = "botoes"
             div.id = "botoes" + indexPasso
             div.innerHTML = `
-                    <button onclick="backWalkthrough()" class="botao">Retroceder</button>
+                    <button onclick="backWalkthrough(${indexPasso})" class="botao">Retroceder</button>
                     <button onclick="executeWalkthrough(${indexPasso})" class="botao" id="avançar">Avançar</button>
             `;
             botoes.appendChild(div);
@@ -179,12 +176,22 @@ function executeWalkthrough(indexPasso) {
     else if (state == 2) {
         state = 3
         iframe2.style.display = "none"
-        putIframe(3, indexPasso)
+        if (!iframe3){
+            putIframe(3, indexPasso)
+        }
+        else{
+            iframe3.style.display = "flex"
+        }
     }
     else if (state == 3) {
         state = 4
         iframe3.style.display = "none"
-        putIframe(4, indexPasso)
+        if (!iframe4){
+            putIframe(4, indexPasso)
+        }
+        else{
+            iframe4.style.display = "flex"
+        }
         avançar.innerHTML = "Acabar";
     }
     else if (state == 4) {
@@ -199,19 +206,19 @@ function executeWalkthrough(indexPasso) {
 }
 
 
-function backWalkthrough() {
-    const inicio = document.getElementById("content")
-    const iframe1 = document.getElementById("iframe1")
+function backWalkthrough(indexPasso) {
+    const passos = document.getElementById("passos")
     const botoes = document.getElementById("botoes")
-    const iframe2 = document.getElementById("iframe2")
-    const iframe3 = document.getElementById("iframe3")
-    const iframe4 = document.getElementById("iframe4")
+    const iframe1 = document.getElementById("iframe1"+indexPasso)
+    const iframe2 = document.getElementById("iframe2"+indexPasso)
+    const iframe3 = document.getElementById("iframe3"+indexPasso)
+    const iframe4 = document.getElementById("iframe4"+indexPasso)
     const avançar = document.getElementById("avançar")
 
     if (state == 1) {
         state = 0
         botoes.style.display = "none"
-        inicio.style.display = "flex"
+        passos.style.display = "block"
         iframe1.style.display = "none"
     }
 
