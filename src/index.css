@@ -114,6 +114,12 @@ body {
     height: 75%;
 }
 
+.passos {
+    display: none;
+    width: 90%;
+    height: 75%;
+}
+
 .severidade {
     display: none;
     align-items: center;

@@ -1,0 +1,43 @@
+@font-face {
+    font-family: 'Roboto';
+    src: url('../public/fonts/Roboto-Bold.ttf');
+    font-weight: bold;
+    font-style: normal;
+}
+
+@font-face {
+    font-family: 'Roboto';
+    src: url('../public/fonts/Roboto-Regular.ttf');
+    font-weight: normal;
+    font-style: normal;
+}
+
+body {
+    padding: 0;
+    margin: 0;
+    overflow: hidden;
+    font-family: 'Roboto';
+}
+
+.formsContainer {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    flex-direction: column;
+}
+
+
+.itemPasso {
+    display: flex;
+    justify-content: space-between;
+    width: 80%;
+}
+
+.botaoContainer {
+    display: flex;
+    align-items: center;
+}
+
+.botaoPreencher {
+    height: 50%;
+}

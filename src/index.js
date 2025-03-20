@@ -29,6 +29,45 @@ function resizeWindow() {
     }
 }
 
+function toPassos(flag) {
+
+    if (flag == 1) {
+        document.getElementById("passos").style.display = "flex"
+        document.getElementById("content").style.display = "none"
+    }
+    else {
+        document.getElementById("passos").style.display = "none"
+        document.getElementById("content").style.display = "flex"
+    }
+}
+
+
+let passoIndex = 1; // Start after qquatro.html
+
+function addNewForm() {
+
+    const container = document.getElementById('formsContainer');
+    const div = document.createElement('div');
+    div.classList.add('itemPasso');
+    div.id = "passo" + passoIndex;
+    div.innerHTML = `
+            <p>Passo ${passoIndex}</p>
+            <div class="botaoContainer">
+                <button onclick="removeForm(${passoIndex})" class="botaoPreencher"> Eliminar passo </button>
+                <button class="botaoPreencher">Preencher ></button>
+            </div>
+    `;
+    container.appendChild(div);
+    passoIndex += 1
+}
+
+function removeForm(numeroPasso) {
+    const divToRemove = document.getElementById(`passo${numeroPasso}`);
+    if (divToRemove) {
+        divToRemove.remove();
+    }
+}
+
 
 function collectFormData() {
     // Get the iframes
@@ -197,7 +236,7 @@ function fillSheet(data, spreadsheetId) {
     const sheetName = localStorage.getItem('nome_user'); // Get the sheet name
     const range = `${sheetName}!B1:E1`;
     const valueInputOption = "RAW";
-    
+
     const values = [
         [
             "O utilizador vai \ntentar executar a \nação correta?",
@@ -217,10 +256,10 @@ function fillSheet(data, spreadsheetId) {
         resource: body,
     }).then((response) => {
         console.log(`${response.result.updatedCells} cells updated.`);
-        
+
         // Now, update background color, text formatting, and column width
         applyFormatting(spreadsheetId, sheetName);
-        
+
     }).catch(error => {
         alert("Erro ao preencher a planilha:" + JSON.stringify(error));
     });
@@ -290,14 +329,14 @@ function applyFormattingRed(spreadsheetId, sheetName, startRow, endRow, startCol
                 repeatCell: {
                     range: {
                         sheetId: sheetId,
-                        startRowIndex: startRow, 
+                        startRowIndex: startRow,
                         endRowIndex: endRow,
-                        startColumnIndex: startCol, 
+                        startColumnIndex: startCol,
                         endColumnIndex: endCol
                     },
                     cell: {
                         userEnteredFormat: {
-                            backgroundColor: { red: 0.88, green: 0.0, blue: 0.0 }, 
+                            backgroundColor: { red: 0.88, green: 0.0, blue: 0.0 },
                             horizontalAlignment: "CENTER"
                         }
                     },
