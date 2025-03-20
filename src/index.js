@@ -54,12 +54,29 @@ function addNewForm() {
             <p>Passo ${passoIndex}</p>
             <div class="botaoContainer">
                 <button onclick="removeForm(${passoIndex})" class="botaoPreencher"> Eliminar passo </button>
-                <button class="botaoPreencher">Preencher ></button>
+                <button onclick="executeWalkthrough(${passoIndex})"class="botaoPreencher">Preencher ></button>
             </div>
     `;
     container.appendChild(div);
     passoIndex += 1
 }
+
+
+
+function putIframe(frame, passo) {
+
+    const container = document.getElementById('cogFrames');
+    const div = document.createElement('iframe');
+
+    div.id = "iframe" + frame + passo;
+    div.className = "iframe" + frame;
+    div.frameBorder = "0"
+    div.src = ["qum", "qdois", "qtres", "qquatro"][frame-1] + ".html";
+
+    container.appendChild(div);
+    passoIndex += 1
+}
+
 
 function removeForm(numeroPasso) {
     const divToRemove = document.getElementById(`passo${numeroPasso}`);
@@ -107,46 +124,76 @@ function collectFormData() {
 
 let state = 0
 
-function executeWalkthrough() {
 
-    const inicio = document.getElementById("content")
+function executeWalkthrough(indexPasso) {
+    const passos = document.getElementById("passos")
     const botoes = document.getElementById("botoes")
-    const iframe1 = document.getElementById("iframe1")
-    const iframe2 = document.getElementById("iframe2")
-    const iframe3 = document.getElementById("iframe3")
-    const iframe4 = document.getElementById("iframe4")
+    const iframe1 = document.getElementById("iframe1"+indexPasso)
+    const iframe2 = document.getElementById("iframe2"+indexPasso)
+    const iframe3 = document.getElementById("iframe3"+indexPasso)
+    const iframe4 = document.getElementById("iframe4"+indexPasso)
     const avançar = document.getElementById("avançar")
-    if (localStorage.getItem("access_token") == null) {
-        document.getElementById("error").innerHTML = "Por favor faça login primeiro"
-    }
-    else if (state == 0) {
+    //if (localStorage.getItem("access_token") == null) {
+    //    document.getElementById("error").innerHTML = "Por favor faça login primeiro"
+    //}
+    if (state == 0) {
+        passos.style.display = "none"
+
+        if (!iframe1){
+            putIframe(1, indexPasso)
+        }
+        else{
+            iframe1.style.display = "flex"
+        }
+
         state = 1
-        botoes.style.display = "flex"
-        inicio.style.display = "none"
-        iframe1.style.display = "flex"
+
+        // Colocar botoes
+        if (!(document.getElementById("botoes"+indexPasso))){
+            const div = document.createElement('div');
+            div.class = "botoes"
+            div.id = "botoes" + indexPasso
+            div.innerHTML = `
+                    <button onclick="backWalkthrough()" class="botao">Retroceder</button>
+                    <button onclick="executeWalkthrough(${indexPasso})" class="botao" id="avançar">Avançar</button>
+            `;
+            botoes.appendChild(div);
+        }
+        else{
+            document.getElementById("botoes").style.display = "flex"
+        }
+
         loadGapiWithAuth(localStorage.getItem('access_token'))
     }
     else if (state == 1) {
         state = 2
         iframe1.style.display = "none"
-        iframe2.style.display = "flex"
+        if (!iframe2){
+            putIframe(2, indexPasso)
+        }
+        else{
+            iframe2.style.display = "flex"
+        }
+        
     }
     else if (state == 2) {
         state = 3
         iframe2.style.display = "none"
-        iframe3.style.display = "flex"
+        putIframe(3, indexPasso)
     }
     else if (state == 3) {
         state = 4
         iframe3.style.display = "none"
-        iframe4.style.display = "flex"
+        putIframe(4, indexPasso)
         avançar.innerHTML = "Acabar";
     }
     else if (state == 4) {
-        state = 5
         iframe4.style.display = "none"
-        collectFormData()
-        //iframe2.style.display = "flex"
+        passos.style.display = "block"
+        botoes.style.display = "none"
+        avançar.innerHTML = "Avançar"
+        state = 0
+        //collectFormData()
     }
     console.log(state)
 }

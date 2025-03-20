@@ -90,34 +90,11 @@ body {
     font-weight: bold;
 }
 
-.iframe1 {
-    display: none;
-    width: 90%;
-    height: 75%;
-}
-
-.iframe2 {
-    display: none;
-    width: 90%;
-    height: 75%;
-}
-
-.iframe3 {
-    display: none;
-    width: 90%;
-    height: 75%;
-}
-
-.iframe4 {
-    display: none;
-    width: 90%;
-    height: 75%;
-}
 
 .passos {
     display: none;
-    width: 90%;
-    height: 75%;
+    width: 100%;
+    height: 100%;
 }
 
 .severidade {
@@ -127,11 +104,7 @@ body {
     width: 100%;
 }
 
-.botoes {
-    display: none;
-    justify-content: space-between;
-    width: 75%;
-}
+
 
 .botao {
     width: 42%;
