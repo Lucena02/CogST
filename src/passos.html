@@ -7,16 +7,24 @@
     <title>Passos</title>
     <link rel="stylesheet" href="passos.css">
     <script src="https://apis.google.com/js/api.js"></script>
+    <script src="https://unpkg.com/lucide@latest"></script>
 </head>
 
-<body class="passos">
-    <div id="passos">
-        <h1>Passos</h1>
-        <div>
-            <button onclick="addNewForm()" id="addForm">+</button>
+<body class="passos2">
+    <div class="containerPassos" id="passos">
+        <div class="topo">
+            <h1>Passos</h1>
+            <div style="display: flex; align-items: center;">
+                <button onclick="addNewForm()" id="addForm"><svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-plus"><path d="M5 12h14"/><path d="M12 5v14"/></svg></button>
+            </div>
+            
         </div>
         <div class="formsContainer" id="formsContainer"></div>
+        <div id="botaoFim" class="botaoFinal">
+            <button onclick="collectForms()" id="addForm">Finalizar</button>
+        </div>
     </div>
+
     <div class="cogContainer" id="cogFrames">
 
         <!--
@@ -28,6 +36,7 @@
     <div id="botoes" class="botoesContainer">
 
     </div>
+
 
     <script src="index.js"></script>
 

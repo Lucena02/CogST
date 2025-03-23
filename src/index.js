@@ -51,8 +51,8 @@ function addNewForm() {
     div.innerHTML = `
             <p>Passo ${passoIndex}</p>
             <div class="botaoContainer">
-                <button onclick="removeForm(${passoIndex})" class="botaoPreencher"> Eliminar passo </button>
-                <button onclick="executeWalkthrough(${passoIndex})"class="botaoPreencher">Preencher ></button>
+                <button onclick="removeForm(${passoIndex})" class="botaoPreencher"> <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-trash-2"><path d="M3 6h18"/><path d="M19 6v14c0 1-1 2-2 2H7c-1 0-2-1-2-2V6"/><path d="M8 6V4c0-1 1-2 2-2h4c1 0 2 1 2 2v2"/><line x1="10" x2="10" y1="11" y2="17"/><line x1="14" x2="14" y1="11" y2="17"/></svg></i> </button>
+                <button onclick="executeWalkthrough(${passoIndex})"class="botaoPreencher"><svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-arrow-right"><path d="M5 12h14"/><path d="m12 5 7 7-7 7"/></svg></button>
             </div>
     `;
     container.appendChild(div);
@@ -69,7 +69,7 @@ function putIframe(frame, passo) {
     div.id = "iframe" + frame + passo;
     div.className = "iframe" + frame;
     div.frameBorder = "0"
-    div.src = ["qum", "qdois", "qtres", "qquatro"][frame-1] + ".html";
+    div.src = ["qzero", "qum", "qdois", "qtres", "qquatro"][frame] + ".html";
 
     container.appendChild(div);
 }
@@ -123,8 +123,10 @@ let state = 0
 
 
 function executeWalkthrough(indexPasso) {
+    console.log("OLD STATE: " + state)
     const passos = document.getElementById("passos")
     const botoes = document.getElementById("botoes")
+    const iframe0 = document.getElementById("iframe0"+indexPasso)
     const iframe1 = document.getElementById("iframe1"+indexPasso)
     const iframe2 = document.getElementById("iframe2"+indexPasso)
     const iframe3 = document.getElementById("iframe3"+indexPasso)
@@ -136,14 +138,12 @@ function executeWalkthrough(indexPasso) {
     if (state == 0) {
         passos.style.display = "none"
 
-        if (!iframe1){
-            putIframe(1, indexPasso)
+        if (!iframe0){
+            putIframe(0, indexPasso)
         }
         else{
-            iframe1.style.display = "flex"
+            iframe0.style.display = "flex"
         }
-
-        state = 1
 
         // Colocar botoes
         if (!(document.getElementById("botoes"+indexPasso))){
@@ -159,11 +159,22 @@ function executeWalkthrough(indexPasso) {
         else{
             document.getElementById("botoes").style.display = "flex"
         }
-
+        console.log("ESTOU A TESTAR")
         loadGapiWithAuth(localStorage.getItem('access_token'))
+        console.log("ARDEU")
+        state += 1
     }
     else if (state == 1) {
-        state = 2
+        iframe0.style.display = "none"
+        if (!iframe1){
+            putIframe(1, indexPasso)
+        }
+        else{
+            iframe1.style.display = "flex"
+        }
+        state += 1
+    }
+    else if (state == 2) {
         iframe1.style.display = "none"
         if (!iframe2){
             putIframe(2, indexPasso)
@@ -171,10 +182,9 @@ function executeWalkthrough(indexPasso) {
         else{
             iframe2.style.display = "flex"
         }
-        
+        state += 1
     }
-    else if (state == 2) {
-        state = 3
+    else if (state == 3) {
         iframe2.style.display = "none"
         if (!iframe3){
             putIframe(3, indexPasso)
@@ -182,9 +192,9 @@ function executeWalkthrough(indexPasso) {
         else{
             iframe3.style.display = "flex"
         }
+        state += 1
     }
-    else if (state == 3) {
-        state = 4
+    else if (state == 4) {
         iframe3.style.display = "none"
         if (!iframe4){
             putIframe(4, indexPasso)
@@ -193,22 +203,25 @@ function executeWalkthrough(indexPasso) {
             iframe4.style.display = "flex"
         }
         avançar.innerHTML = "Acabar";
+        state += 1
     }
-    else if (state == 4) {
+    else if (state == 5) {
         iframe4.style.display = "none"
-        passos.style.display = "block"
+        passos.style.display = "flex"
         botoes.style.display = "none"
         avançar.innerHTML = "Avançar"
         state = 0
-        //collectFormData()
     }
-    console.log(state)
+
+
+    console.log("NEW STATE: " + state)
 }
 
 
 function backWalkthrough(indexPasso) {
     const passos = document.getElementById("passos")
     const botoes = document.getElementById("botoes")
+    const iframe0 = document.getElementById("iframe0"+indexPasso)
     const iframe1 = document.getElementById("iframe1"+indexPasso)
     const iframe2 = document.getElementById("iframe2"+indexPasso)
     const iframe3 = document.getElementById("iframe3"+indexPasso)
@@ -216,28 +229,29 @@ function backWalkthrough(indexPasso) {
     const avançar = document.getElementById("avançar")
 
     if (state == 1) {
-        state = 0
         botoes.style.display = "none"
-        passos.style.display = "block"
-        iframe1.style.display = "none"
+        passos.style.display = "flex"
+        iframe0.style.display = "none"
     }
 
     if (state == 2) {
-        state = 1
+        iframe0.style.display = "flex"
+        iframe1.style.display = "none"
+    }
+    if (state == 3) {
         iframe1.style.display = "flex"
         iframe2.style.display = "none"
     }
-    if (state == 3) {
-        state = 2
+    if (state == 4) {
         iframe2.style.display = "flex"
         iframe3.style.display = "none"
     }
-    if (state == 4) {
-        state = 3
+    if (state == 5) {
         iframe3.style.display = "flex"
         iframe4.style.display = "none"
         avançar.innerHTML = "Avançar";
     }
+    state -= 1;
 }
 
 
