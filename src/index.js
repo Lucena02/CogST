@@ -3,7 +3,8 @@
 document.documentElement.style.setProperty('--tab-width', '298px');
 document.documentElement.style.setProperty('--tab-height', '398px');
 let flag = 0;
-
+let googleFormsVar = null
+let tarefaVar = null
 
 
 function resizeWindow() {
@@ -16,22 +17,27 @@ function resizeWindow() {
         window.electronAPI.updateWindowSize(16);
         seta.innerHTML = "<";
         content.style.display = "none";
-        
+
     }
     else {
         document.documentElement.style.setProperty('--tab-width', '298px');
         window.electronAPI.updateWindowSize(300);
         seta.innerHTML = ">";
         content.style.display = "flex";
-        
+
     }
 }
+
+
 
 function toPassos(flag) {
 
     if (flag == 1) {
         document.getElementById("passos").style.display = "flex"
         document.getElementById("content").style.display = "none"
+        googleFormsVar = document.getElementById('google-link').value
+        tarefaVar = document.getElementById('tarefa').value
+        loadGapiWithAuth(localStorage.getItem('access_token'))
     }
     else {
         document.getElementById("passos").style.display = "none"
@@ -77,12 +83,21 @@ function putIframe(frame, passo) {
 
 function removeForm(numeroPasso) {
     const divToRemove = document.getElementById(`passo${numeroPasso}`);
-    if (divToRemove) {
-        divToRemove.remove();
-    }
+    const iframe0 = document.getElementById("iframe0" + numeroPasso)
+    const iframe1 = document.getElementById("iframe1" + numeroPasso)
+    const iframe2 = document.getElementById("iframe2" + numeroPasso)
+    const iframe3 = document.getElementById("iframe3" + numeroPasso)
+    const iframe4 = document.getElementById("iframe4" + numeroPasso)
+
+    divToRemove.remove();
+    iframe0.remove();
+    iframe1.remove();
+    iframe2.remove();
+    iframe3.remove();
+    iframe4.remove();
 }
 
-
+/*
 function collectFormData() {
     // Get the iframes
     const iframe1 = document.getElementById("iframe1").contentWindow.document;
@@ -118,6 +133,72 @@ function collectFormData() {
     writeStats(data, data.inicio.googleLink)
 
 }
+*/
+
+function collectFormData() {
+    // Get all iframes that match the pattern "iframeN1", "iframeN2", etc.
+    const iframeGroups = {};
+    document.querySelectorAll("iframe[id^='iframe']").forEach(iframe => {
+        const match = iframe.id.match(/iframe(\d+)(\d)/);
+        if (match) {
+            const [_, frame, passo] = match;
+            if (!iframeGroups[passo]) {
+                iframeGroups[passo] = {};
+            }
+            iframeGroups[passo][`q${frame}`] = iframe.contentWindow.document;
+        }
+    });
+
+    // Function to extract values from each iframe form
+    function getFormData(iframeDoc, qKey) {
+        if (qKey == "q0") {
+            const passoDescricao = iframeDoc.getElementById("passoDesc")?.value || "";
+            if (!passoDescricao) return ""
+            return { passoDescricao }
+        }
+
+        const problema = iframeDoc.getElementById("problema-sim")?.checked ? iframeDoc.getElementById("problema-sim").value :
+            iframeDoc.getElementById("problema-nao")?.checked ? iframeDoc.getElementById("problema-nao").value :
+                "";
+        const severidade = iframeDoc.getElementById("gravidade")?.value || "";
+        const comentarios = iframeDoc.getElementById("comentarios")?.value || "";
+
+        // Check if the form has any meaningful data
+        if (!problema && !severidade && !comentarios) {
+            return null; // Return null if the form is empty
+        }
+
+        return { problema, severidade, comentarios };
+    }
+
+    // Collect data from each iframe dynamically
+    const data = {
+        inicio: {
+            tarefa: tarefaVar,
+            googleLink: googleFormsVar
+        }
+    };
+
+    Object.keys(iframeGroups).forEach(group => {
+        const groupData = {};
+        // qKey -> em que frame estamos
+        Object.keys(iframeGroups[group]).forEach(qKey => {
+            const formData = getFormData(iframeGroups[group][qKey], qKey);
+            if (formData) { // Only include non-empty forms
+                groupData[qKey] = formData;
+            }
+        });
+
+        if (Object.keys(groupData).length > 0) { // Only include groups with data
+            data[`passo${group}`] = groupData;
+        }
+    });
+
+    alert(JSON.stringify(data, null, 2));
+    writeStats(data, data.inicio.googleLink);
+}
+
+
 
 let state = 0
 
@@ -126,11 +207,12 @@ function executeWalkthrough(indexPasso) {
     console.log("OLD STATE: " + state)
     const passos = document.getElementById("passos")
     const botoes = document.getElementById("botoes")
-    const iframe0 = document.getElementById("iframe0"+indexPasso)
-    const iframe1 = document.getElementById("iframe1"+indexPasso)
-    const iframe2 = document.getElementById("iframe2"+indexPasso)
-    const iframe3 = document.getElementById("iframe3"+indexPasso)
-    const iframe4 = document.getElementById("iframe4"+indexPasso)
+    const botoesIndex = document.getElementById("botoes" + indexPasso)
+    const iframe0 = document.getElementById("iframe0" + indexPasso)
+    const iframe1 = document.getElementById("iframe1" + indexPasso)
+    const iframe2 = document.getElementById("iframe2" + indexPasso)
+    const iframe3 = document.getElementById("iframe3" + indexPasso)
+    const iframe4 = document.getElementById("iframe4" + indexPasso)
     const avançar = document.getElementById("avançar")
     //if (localStorage.getItem("access_token") == null) {
     //    document.getElementById("error").innerHTML = "Por favor faça login primeiro"
@@ -138,15 +220,15 @@ function executeWalkthrough(indexPasso) {
     if (state == 0) {
         passos.style.display = "none"
 
-        if (!iframe0){
+        if (!iframe0) {
             putIframe(0, indexPasso)
         }
-        else{
+        else {
             iframe0.style.display = "flex"
         }
 
         // Colocar botoes
-        if (!(document.getElementById("botoes"+indexPasso))){
+        if (!(document.getElementById("botoes" + indexPasso))) {
             const div = document.createElement('div');
             div.className = "botoes"
             div.id = "botoes" + indexPasso
@@ -155,51 +237,54 @@ function executeWalkthrough(indexPasso) {
                     <button onclick="executeWalkthrough(${indexPasso})" class="botao" id="avançar">Avançar</button>
             `;
             botoes.appendChild(div);
+
+
         }
-        else{
-            document.getElementById("botoes").style.display = "flex"
+        else {
+            botoesIndex.style.display = "flex"
         }
-        console.log("ESTOU A TESTAR")
-        loadGapiWithAuth(localStorage.getItem('access_token'))
-        console.log("ARDEU")
+
+        botoes.style.display = "flex"
+
+
         state += 1
     }
     else if (state == 1) {
         iframe0.style.display = "none"
-        if (!iframe1){
+        if (!iframe1) {
             putIframe(1, indexPasso)
         }
-        else{
+        else {
             iframe1.style.display = "flex"
         }
         state += 1
     }
     else if (state == 2) {
         iframe1.style.display = "none"
-        if (!iframe2){
+        if (!iframe2) {
             putIframe(2, indexPasso)
         }
-        else{
+        else {
             iframe2.style.display = "flex"
         }
         state += 1
     }
     else if (state == 3) {
         iframe2.style.display = "none"
-        if (!iframe3){
+        if (!iframe3) {
             putIframe(3, indexPasso)
         }
-        else{
+        else {
             iframe3.style.display = "flex"
         }
         state += 1
     }
     else if (state == 4) {
         iframe3.style.display = "none"
-        if (!iframe4){
+        if (!iframe4) {
             putIframe(4, indexPasso)
         }
-        else{
+        else {
             iframe4.style.display = "flex"
         }
         avançar.innerHTML = "Acabar";
@@ -210,6 +295,7 @@ function executeWalkthrough(indexPasso) {
         passos.style.display = "flex"
         botoes.style.display = "none"
         avançar.innerHTML = "Avançar"
+        botoesIndex.style.display = "none"
         state = 0
     }
 
@@ -221,14 +307,16 @@ function executeWalkthrough(indexPasso) {
 function backWalkthrough(indexPasso) {
     const passos = document.getElementById("passos")
     const botoes = document.getElementById("botoes")
-    const iframe0 = document.getElementById("iframe0"+indexPasso)
-    const iframe1 = document.getElementById("iframe1"+indexPasso)
-    const iframe2 = document.getElementById("iframe2"+indexPasso)
-    const iframe3 = document.getElementById("iframe3"+indexPasso)
-    const iframe4 = document.getElementById("iframe4"+indexPasso)
+    const botoesIndex = document.getElementById("botoes" + indexPasso)
+    const iframe0 = document.getElementById("iframe0" + indexPasso)
+    const iframe1 = document.getElementById("iframe1" + indexPasso)
+    const iframe2 = document.getElementById("iframe2" + indexPasso)
+    const iframe3 = document.getElementById("iframe3" + indexPasso)
+    const iframe4 = document.getElementById("iframe4" + indexPasso)
     const avançar = document.getElementById("avançar")
 
     if (state == 1) {
+        botoesIndex.style.display = "none"
         botoes.style.display = "none"
         passos.style.display = "flex"
         iframe0.style.display = "none"
