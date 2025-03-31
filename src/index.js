@@ -5,7 +5,7 @@ document.documentElement.style.setProperty('--tab-height', '398px');
 let flag = 0;
 let googleFormsVar = null
 let tarefaVar = null
-
+let passoIndex = 1;
 
 function resizeWindow() {
     const content = document.getElementById("contentA");
@@ -46,7 +46,7 @@ function toPassos(flag) {
 }
 
 
-let passoIndex = 1; // Start after qquatro.html
+
 
 function addNewForm() {
 
@@ -55,7 +55,7 @@ function addNewForm() {
     div.classList.add('itemPasso');
     div.id = "passo" + passoIndex;
     div.innerHTML = `
-            <p>Passo ${passoIndex}</p>
+            <p id="passoDesc${passoIndex}" class="passoDescOverflow">Passo ${passoIndex}</p>
             <div class="botaoContainer">
                 <button onclick="removeForm(${passoIndex})" class="botaoPreencher"> <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-trash-2"><path d="M3 6h18"/><path d="M19 6v14c0 1-1 2-2 2H7c-1 0-2-1-2-2V6"/><path d="M8 6V4c0-1 1-2 2-2h4c1 0 2 1 2 2v2"/><line x1="10" x2="10" y1="11" y2="17"/><line x1="14" x2="14" y1="11" y2="17"/></svg></i> </button>
                 <button onclick="executeWalkthrough(${passoIndex})"class="botaoPreencher"><svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-arrow-right"><path d="M5 12h14"/><path d="m12 5 7 7-7 7"/></svg></button>
@@ -65,6 +65,40 @@ function addNewForm() {
     passoIndex += 1
 }
 
+
+
+function exportPassos() {
+    const passosData = {};
+
+    document.querySelectorAll("iframe[id^='iframe']").forEach(iframe => {
+        const match = iframe.id.match(/iframe(\d+)(\d)/);
+        if (match) {
+            const [_, frame, passo] = match;
+            if (frame == "0") {
+
+                if (!passosData[passo]) {
+                    passosData[passo] = {};
+                }
+
+                const iframeDoc = iframe.contentWindow.document;
+                const passoDescricao = iframeDoc.getElementById("passoDesc")?.value || `Passo ${passo}`;
+                passosData[passo].nome = passoDescricao;
+            }
+        }
+    });
+
+
+    const jsonData = JSON.stringify(passosData);
+
+
+    const blob = new Blob([jsonData], { type: "application/json" });
+    const a = document.createElement("a");
+    a.href = URL.createObjectURL(blob);
+    a.download = "passos.json";
+    document.body.appendChild(a);
+    a.click();
+    document.body.removeChild(a);
+}
 
 
 function putIframe(frame, passo) {
@@ -213,6 +247,7 @@ function executeWalkthrough(indexPasso) {
     const iframe2 = document.getElementById("iframe2" + indexPasso)
     const iframe3 = document.getElementById("iframe3" + indexPasso)
     const iframe4 = document.getElementById("iframe4" + indexPasso)
+    const nomePasso = document.getElementById("passoDesc" + indexPasso)
     const avançar = document.getElementById("avançar")
     //if (localStorage.getItem("access_token") == null) {
     //    document.getElementById("error").innerHTML = "Por favor faça login primeiro"
@@ -256,6 +291,10 @@ function executeWalkthrough(indexPasso) {
         }
         else {
             iframe1.style.display = "flex"
+        }
+
+        if (iframe0.contentDocument.getElementById("passoDesc")?.value) {
+            nomePasso.innerHTML = iframe0.contentDocument.getElementById("passoDesc")?.value
         }
         state += 1
     }
@@ -313,9 +352,13 @@ function backWalkthrough(indexPasso) {
     const iframe2 = document.getElementById("iframe2" + indexPasso)
     const iframe3 = document.getElementById("iframe3" + indexPasso)
     const iframe4 = document.getElementById("iframe4" + indexPasso)
+    const nomePasso = document.getElementById("passoDesc" + indexPasso)
     const avançar = document.getElementById("avançar")
 
     if (state == 1) {
+        if (iframe0.contentDocument.getElementById("passoDesc")?.value) {
+            nomePasso.innerHTML = iframe0.contentDocument.getElementById("passoDesc")?.value
+        }
         botoesIndex.style.display = "none"
         botoes.style.display = "none"
         passos.style.display = "flex"

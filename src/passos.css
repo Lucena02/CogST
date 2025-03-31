@@ -11,6 +11,7 @@
     font-weight: normal;
     font-style: normal;
 }
+
 html {
     height: 100%;
 }
@@ -28,16 +29,16 @@ body {
 }
 
 
-.containerPassos{
+.containerPassos {
     height: 100%;
     display: flex;
     flex-direction: column;
     align-items: center;
-    overflow:auto;
+    overflow: auto;
 }
 
 
-.topo{
+.topo {
     display: flex;
     flex-direction: row;
     justify-content: space-between;
@@ -50,8 +51,10 @@ body {
     display: flex;
     align-items: center;
     flex-direction: column;
-    overflow-y:scroll;  /* Adiciona scroll vertical */
-    overflow-x: hidden; /* Evita scroll horizontal */
+    overflow-y: scroll;
+    /* Adiciona scroll vertical */
+    overflow-x: hidden;
+    /* Evita scroll horizontal */
 }
 
 
@@ -72,7 +75,7 @@ body {
     height: 50%;
 }
 
-.cogContainer{
+.cogContainer {
     display: flex;
     flex-direction: column;
     align-items: center;
@@ -104,7 +107,7 @@ body {
     height: 100%;
 }
 
-.botoesContainer{
+.botoesContainer {
     height: 100%;
     display: flex;
     justify-content: center;
@@ -115,4 +118,19 @@ body {
     justify-content: space-between;
     width: 85%;
     height: 25px;
+}
+
+
+.passoDescOverflow {
+    overflow: hidden;
+    white-space: nowrap;
+    text-overflow: ellipsis;
+    width: 60%;
+}
+
+.botoesImportar {
+    display: flex;
+    width: 75%;
+    justify-content: space-between;
+    margin-bottom: 10px;
 }
