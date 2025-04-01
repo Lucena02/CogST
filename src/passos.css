@@ -134,3 +134,8 @@ body {
     justify-content: space-between;
     margin-bottom: 10px;
 }
+
+input[type='file'] {
+    width: 115px;
+    overflow: hidden;
+}

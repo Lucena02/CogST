@@ -7,11 +7,11 @@ let googleFormsVar = null
 let tarefaVar = null
 let passoIndex = 1;
 
+
 function resizeWindow() {
     const content = document.getElementById("contentA");
     let seta = document.getElementById("seta");
     let tabWidth = getComputedStyle(document.documentElement).getPropertyValue('--tab-width').trim();
-
     if (tabWidth === '298px') {
         document.documentElement.style.setProperty('--tab-width', '16px');
         window.electronAPI.updateWindowSize(16);
@@ -31,13 +31,15 @@ function resizeWindow() {
 
 
 function toPassos(flag) {
-
-    if (flag == 1) {
+    if (localStorage.getItem("access_token") == null) {
+        document.getElementById("error").innerHTML = "Por favor faça login primeiro"
+    }
+    else if (flag == 1) {
+        loadGapiWithAuth(localStorage.getItem('access_token'))
         document.getElementById("passos").style.display = "flex"
         document.getElementById("content").style.display = "none"
         googleFormsVar = document.getElementById('google-link').value
         tarefaVar = document.getElementById('tarefa').value
-        loadGapiWithAuth(localStorage.getItem('access_token'))
     }
     else {
         document.getElementById("passos").style.display = "none"
@@ -65,6 +67,54 @@ function addNewForm() {
     passoIndex += 1
 }
 
+function addNewFormArgumento(passoIndexBom) {
+
+    const container = document.getElementById('formsContainer');
+    const div = document.createElement('div');
+    div.classList.add('itemPasso');
+    div.id = "passo" + passoIndexBom;
+    div.innerHTML = `
+            <p id="passoDesc${passoIndexBom}" class="passoDescOverflow">Passo ${passoIndexBom}</p>
+            <div class="botaoContainer">
+                <button onclick="removeForm(${passoIndexBom})" class="botaoPreencher"> <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-trash-2"><path d="M3 6h18"/><path d="M19 6v14c0 1-1 2-2 2H7c-1 0-2-1-2-2V6"/><path d="M8 6V4c0-1 1-2 2-2h4c1 0 2 1 2 2v2"/><line x1="10" x2="10" y1="11" y2="17"/><line x1="14" x2="14" y1="11" y2="17"/></svg></i> </button>
+                <button onclick="executeWalkthrough(${passoIndexBom})"class="botaoPreencher"><svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-arrow-right"><path d="M5 12h14"/><path d="m12 5 7 7-7 7"/></svg></button>
+            </div>
+    `;
+    container.appendChild(div);
+}
+
+
+function importPassos() {
+    const input = document.getElementById("fileInput")
+
+    if (input.files.length > 0) {
+        const file = input.files[0];
+
+        // Ler o conteúdo do ficheiro (se for necessário)
+        const reader = new FileReader();
+        reader.onload = function (event) {
+            try {
+                const jsonData = JSON.parse(event.target.result);
+                alert(passoIndex)
+                while (passoIndex != 1) {
+                    alert(passoIndex)
+                    removeForm(passoIndex)
+                    passoIndex = passoIndex - 1
+                }
+                for (const key in jsonData) {
+                    addNewFormArgumento(key)
+                }
+                const keys = Object.keys(jsonData);
+                passoIndex = parseInt(keys[keys.length - 1]) + 1;
+            } catch (e) {
+                alert("Erro ao parsear o JSON: " + e.message);
+            }
+        };
+        reader.readAsText(file);
+    } else {
+        alert("Nenhum ficheiro selecionado.");
+    }
+}
 
 
 function exportPassos() {
@@ -131,43 +181,6 @@ function removeForm(numeroPasso) {
     iframe4.remove();
 }
 
-/*
-function collectFormData() {
-    // Get the iframes
-    const iframe1 = document.getElementById("iframe1").contentWindow.document;
-    const iframe2 = document.getElementById("iframe2").contentWindow.document;
-    const iframe3 = document.getElementById("iframe3").contentWindow.document;
-    const iframe4 = document.getElementById("iframe4").contentWindow.document;
-
-    // Function to extract values from each iframe form
-    function getFormData(iframeDoc) {
-        return {
-            problema: iframeDoc.getElementById("problema-sim")?.checked ? iframeDoc.getElementById("problema-sim").value :
-                iframeDoc.getElementById("problema-nao")?.checked ? iframeDoc.getElementById("problema-nao").value :
-                    "No selection",
-            severidade: iframeDoc.getElementById("gravidade")?.value || "Not selected",
-            comentarios: iframeDoc.getElementById("comentarios")?.value || "No comments"
-        };
-    }
-
-
-    // Collect data from each form
-    const data = {
-        inicio: {
-            tarefa: document.getElementById('tarefa').value,
-            googleLink: document.getElementById('google-link').value
-        },
-        qum: getFormData(iframe1),
-        qdois: getFormData(iframe2),
-        qtres: getFormData(iframe3),
-        qquatro: getFormData(iframe4)
-    };
-
-    alert(JSON.stringify(data, null, 2));
-    writeStats(data, data.inicio.googleLink)
-
-}
-*/
 
 function collectFormData() {
     // Get all iframes that match the pattern "iframeN1", "iframeN2", etc.
@@ -249,9 +262,7 @@ function executeWalkthrough(indexPasso) {
     const iframe4 = document.getElementById("iframe4" + indexPasso)
     const nomePasso = document.getElementById("passoDesc" + indexPasso)
     const avançar = document.getElementById("avançar")
-    //if (localStorage.getItem("access_token") == null) {
-    //    document.getElementById("error").innerHTML = "Por favor faça login primeiro"
-    //}
+
     if (state == 0) {
         passos.style.display = "none"
 
@@ -387,7 +398,7 @@ function backWalkthrough(indexPasso) {
 
 
 
-const API_KEY = window.env.SHEET_API_KEY;
+
 function writeStats(data, url) {
     const regex = /\/\w+\//g;
     const matches = url.match(regex);
@@ -564,45 +575,26 @@ function applyFormattingRed(spreadsheetId, sheetName, startRow, endRow, startCol
 
 // GAPI
 function loadGapiWithAuth(accessToken) {
-    gapi.load("client", () => {
-        gapi.client.init({
-            apiKey: API_KEY,
-            discoveryDocs: ["https://sheets.googleapis.com/$discovery/rest?version=v4"]
-        }).then(() => {
-            gapi.client.setToken({ access_token: accessToken }); // ✅ Set access token
-            console.log("GAPI Loaded & Authenticated!");
-        }).catch(error => {
-            console.log("Error initializing GAPI:", error);
+    if (accessToken) {
+        gapi.load("client", () => {
+            gapi.client.init({
+                apiKey: window.env.SHEET_API_KEY, // ALTEREI UMA VARIAVEL PELA BUSCA DIRETA AO .ENV
+                discoveryDocs: ["https://sheets.googleapis.com/$discovery/rest?version=v4"]
+            }).then(() => {
+                gapi.client.setToken({ access_token: accessToken });
+                console.log("GAPI Loaded & Authenticated!");
+            }).catch(error => {
+                console.log("Error initializing GAPI:", error);
+            });
         });
-    });
-}
-
-
-
-
-
-// Logica do Login
-
-function login() {
-    if (localStorage.getItem("access_token") == null) {
-        window.electronAPI.doLogin();
-        document.getElementById("error").innerHTML = ""
     }
     else {
-        document.getElementById("login").innerHTML = "Login";
-        localStorage.clear()
+        console.log("Nao ha access token")
     }
 }
 
-// Para mudar o botao para Logout caso haja uma token valida
-if (localStorage.getItem("access_token") != null) {
-    document.getElementById("login").innerHTML = "Logout";
-}
 
-// Para verificar se de facto alguem fez login
-window.electronAPI.onAccessToken((event, accessToken) => {
-    const statusElement = document.getElementById('login');
-    if (accessToken) {
-        statusElement.innerHTML = "Logout";
-    }
-});
+
+
+
+

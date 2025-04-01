@@ -63,9 +63,9 @@ const CLIENT_ID = process.env.ID_CLIENTE;
 const CLIENT_SECRET = process.env.SECRET_CLIENTE;
 const REDIRECT_URI = "http://localhost:3000";
 const SCOPES = [
-    "openid",    
-    "profile",        
-    "email",            
+    "openid",
+    "profile",
+    "email",
     "https://www.googleapis.com/auth/spreadsheets"
 ];
 

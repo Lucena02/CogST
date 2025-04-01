@@ -25,9 +25,13 @@
 
         </div>
         <div class="formsContainer" id="formsContainer"></div>
-
+        <div style="display: flex">
+            <input type="file" id="fileInput">
+            <div style="color:black; font-size: 12px;" id="feedbackImportar"></div>
+        </div>
         <div id="botoesImportar" class="botoesImportar">
-            <button onclick="" id="addForm">Importar</button>
+
+            <button onclick="importPassos()" id="addForm">Importar</button>
             <button onclick="exportPassos()" id="addForm">Exportar</button>
         </div>
         <div id="botaoFim" class="botaoFinal">
@@ -49,5 +53,5 @@
 
 
     <script src="index.js"></script>
-
+    <script src="passos.js"></script>
 </body>
