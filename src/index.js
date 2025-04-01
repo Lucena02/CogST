@@ -67,14 +67,14 @@ function addNewForm() {
     passoIndex += 1
 }
 
-function addNewFormArgumento(passoIndexBom) {
-
+function addNewFormArgumento(passoIndexBom, passoDesc) {
+    if (passoDesc == undefined) passoDesc = "Passo " + passoIndexBom
     const container = document.getElementById('formsContainer');
     const div = document.createElement('div');
     div.classList.add('itemPasso');
     div.id = "passo" + passoIndexBom;
     div.innerHTML = `
-            <p id="passoDesc${passoIndexBom}" class="passoDescOverflow">Passo ${passoIndexBom}</p>
+            <p id="passoDesc${passoIndexBom}" class="passoDescOverflow">${passoDesc}</p>
             <div class="botaoContainer">
                 <button onclick="removeForm(${passoIndexBom})" class="botaoPreencher"> <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-trash-2"><path d="M3 6h18"/><path d="M19 6v14c0 1-1 2-2 2H7c-1 0-2-1-2-2V6"/><path d="M8 6V4c0-1 1-2 2-2h4c1 0 2 1 2 2v2"/><line x1="10" x2="10" y1="11" y2="17"/><line x1="14" x2="14" y1="11" y2="17"/></svg></i> </button>
                 <button onclick="executeWalkthrough(${passoIndexBom})"class="botaoPreencher"><svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-arrow-right"><path d="M5 12h14"/><path d="m12 5 7 7-7 7"/></svg></button>
@@ -95,14 +95,12 @@ function importPassos() {
         reader.onload = function (event) {
             try {
                 const jsonData = JSON.parse(event.target.result);
-                alert(passoIndex)
                 while (passoIndex != 1) {
-                    alert(passoIndex)
-                    removeForm(passoIndex)
+                    removeForm(passoIndex - 1)
                     passoIndex = passoIndex - 1
                 }
                 for (const key in jsonData) {
-                    addNewFormArgumento(key)
+                    addNewFormArgumento(key, jsonData[key].nome)
                 }
                 const keys = Object.keys(jsonData);
                 passoIndex = parseInt(keys[keys.length - 1]) + 1;
@@ -164,7 +162,7 @@ function putIframe(frame, passo) {
     container.appendChild(div);
 }
 
-
+// Código Maligno
 function removeForm(numeroPasso) {
     const divToRemove = document.getElementById(`passo${numeroPasso}`);
     const iframe0 = document.getElementById("iframe0" + numeroPasso)
@@ -173,12 +171,24 @@ function removeForm(numeroPasso) {
     const iframe3 = document.getElementById("iframe3" + numeroPasso)
     const iframe4 = document.getElementById("iframe4" + numeroPasso)
 
-    divToRemove.remove();
-    iframe0.remove();
-    iframe1.remove();
-    iframe2.remove();
-    iframe3.remove();
-    iframe4.remove();
+    if (divToRemove) {
+        divToRemove.remove();
+    }
+    if (iframe0) {
+        iframe0.remove();
+    }
+    if (iframe1) {
+        iframe1.remove();
+    }
+    if (iframe2) {
+        iframe2.remove();
+    }
+    if (iframe3) {
+        iframe3.remove();
+    }
+    if (iframe4) {
+        iframe4.remove();
+    }
 }
 
 
@@ -268,6 +278,11 @@ function executeWalkthrough(indexPasso) {
 
         if (!iframe0) {
             putIframe(0, indexPasso)
+            // Para alterar o texto dentro do iframe0 para o nome do passo (Para os casos do import)
+            const iframe0 = document.getElementById("iframe0" + indexPasso)
+            iframe0.onload = function () {
+                iframe0.contentDocument.getElementById("passoDesc").innerHTML = document.getElementById("passoDesc" + indexPasso).innerHTML;
+            };
         }
         else {
             iframe0.style.display = "flex"
@@ -578,7 +593,7 @@ function loadGapiWithAuth(accessToken) {
     if (accessToken) {
         gapi.load("client", () => {
             gapi.client.init({
-                apiKey: window.env.SHEET_API_KEY, // ALTEREI UMA VARIAVEL PELA BUSCA DIRETA AO .ENV
+                apiKey: window.env.SHEET_API_KEY,
                 discoveryDocs: ["https://sheets.googleapis.com/$discovery/rest?version=v4"]
             }).then(() => {
                 gapi.client.setToken({ access_token: accessToken });
