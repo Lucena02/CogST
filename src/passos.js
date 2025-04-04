@@ -10,3 +10,4 @@ try {
 } catch (error) {
     alert("Error in file input event listener: " + error.message);
 }
+

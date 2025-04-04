@@ -1,57 +1,11 @@
 
 // Set global CSS variables dynamically
-document.documentElement.style.setProperty('--tab-width', '298px');
-document.documentElement.style.setProperty('--tab-height', '398px');
+
 let flag = 0;
-let googleFormsVar = null
-let tarefaVar = null
 let passoIndex = 1;
 
 
-function resizeWindow() {
-    const content = document.getElementById("contentA");
-    let seta = document.getElementById("seta");
-    let tabWidth = getComputedStyle(document.documentElement).getPropertyValue('--tab-width').trim();
-    if (tabWidth === '298px') {
-        document.documentElement.style.setProperty('--tab-width', '16px');
-        window.electronAPI.updateWindowSize(16);
-        seta.innerHTML = "<";
-        content.style.display = "none";
-
-    }
-    else {
-        document.documentElement.style.setProperty('--tab-width', '298px');
-        window.electronAPI.updateWindowSize(300);
-        seta.innerHTML = ">";
-        content.style.display = "flex";
-
-    }
-}
-
-
-
-function toPassos(flag) {
-    if (localStorage.getItem("access_token") == null) {
-        document.getElementById("error").innerHTML = "Por favor faça login primeiro"
-    }
-    else if (flag == 1) {
-        loadGapiWithAuth(localStorage.getItem('access_token'))
-        document.getElementById("passos").style.display = "flex"
-        document.getElementById("content").style.display = "none"
-        googleFormsVar = document.getElementById('google-link').value
-        tarefaVar = document.getElementById('tarefa').value
-    }
-    else {
-        document.getElementById("passos").style.display = "none"
-        document.getElementById("content").style.display = "flex"
-    }
-}
-
-
-
-
 function addNewForm() {
-
     const container = document.getElementById('formsContainer');
     const div = document.createElement('div');
     div.classList.add('itemPasso');
@@ -117,21 +71,22 @@ function importPassos() {
 
 function exportPassos() {
     const passosData = {};
-
-    document.querySelectorAll("iframe[id^='iframe']").forEach(iframe => {
-        const match = iframe.id.match(/iframe(\d+)(\d)/);
+    document.querySelectorAll("div[id^='passo']").forEach(passooo => {
+        const match = passooo.id.match(/passo(\d+)/);
         if (match) {
-            const [_, frame, passo] = match;
-            if (frame == "0") {
+            const [_, passo] = match;
 
-                if (!passosData[passo]) {
-                    passosData[passo] = {};
-                }
 
-                const iframeDoc = iframe.contentWindow.document;
-                const passoDescricao = iframeDoc.getElementById("passoDesc")?.value || `Passo ${passo}`;
-                passosData[passo].nome = passoDescricao;
+            if (!passosData[passo]) {
+                passosData[passo] = {};
             }
+
+            const passoID = "passoDesc" + passo
+            alert(passoID)
+            const passoDescricao = passooo.querySelector(`#${passoID}`)?.textContent;
+            alert(passoDescricao)
+            passosData[passo].nome = passoDescricao;
+
         }
     });
 
@@ -192,68 +147,6 @@ function removeForm(numeroPasso) {
 }
 
 
-function collectFormData() {
-    // Get all iframes that match the pattern "iframeN1", "iframeN2", etc.
-    const iframeGroups = {};
-    document.querySelectorAll("iframe[id^='iframe']").forEach(iframe => {
-        const match = iframe.id.match(/iframe(\d+)(\d)/);
-        if (match) {
-            const [_, frame, passo] = match;
-            if (!iframeGroups[passo]) {
-                iframeGroups[passo] = {};
-            }
-            iframeGroups[passo][`q${frame}`] = iframe.contentWindow.document;
-        }
-    });
-
-    // Function to extract values from each iframe form
-    function getFormData(iframeDoc, qKey) {
-        if (qKey == "q0") {
-            const passoDescricao = iframeDoc.getElementById("passoDesc")?.value || "";
-            if (!passoDescricao) return ""
-            return { passoDescricao }
-        }
-
-        const problema = iframeDoc.getElementById("problema-sim")?.checked ? iframeDoc.getElementById("problema-sim").value :
-            iframeDoc.getElementById("problema-nao")?.checked ? iframeDoc.getElementById("problema-nao").value :
-                "";
-        const severidade = iframeDoc.getElementById("gravidade")?.value || "";
-        const comentarios = iframeDoc.getElementById("comentarios")?.value || "";
-
-        // Check if the form has any meaningful data
-        if (!problema && !severidade && !comentarios) {
-            return null; // Return null if the form is empty
-        }
-
-        return { problema, severidade, comentarios };
-    }
-
-    // Collect data from each iframe dynamically
-    const data = {
-        inicio: {
-            tarefa: tarefaVar,
-            googleLink: googleFormsVar
-        }
-    };
-
-    Object.keys(iframeGroups).forEach(group => {
-        const groupData = {};
-        // qKey -> em que frame estamos
-        Object.keys(iframeGroups[group]).forEach(qKey => {
-            const formData = getFormData(iframeGroups[group][qKey], qKey);
-            if (formData) { // Only include non-empty forms
-                groupData[qKey] = formData;
-            }
-        });
-
-        if (Object.keys(groupData).length > 0) { // Only include groups with data
-            data[`passo${group}`] = groupData;
-        }
-    });
-
-    alert(JSON.stringify(data, null, 2));
-    writeStats(data, data.inicio.googleLink);
-}
 
 
 
@@ -412,19 +305,112 @@ function backWalkthrough(indexPasso) {
 }
 
 
+function collectFormData() {
+    // Get all iframes that match the pattern "iframeN1", "iframeN2", etc.
+    const iframeGroups = {};
+    document.querySelectorAll("iframe[id^='iframe']").forEach(iframe => {
+        const match = iframe.id.match(/iframe(\d+)(\d)/);
+        if (match) {
+            const [_, frame, passo] = match;
+            if (!iframeGroups[passo]) {
+                iframeGroups[passo] = {};
+            }
+            iframeGroups[passo][`q${frame}`] = iframe.contentWindow.document;
+        }
+    });
+
+    // Function to extract values from each iframe form
+    function getFormData(iframeDoc, qKey) {
+        if (qKey == "q0") {
+            const passoDescricao = iframeDoc.getElementById("passoDesc")?.value || "";
+            if (!passoDescricao) return ""
+            return { passoDescricao }
+        }
+
+        const problema = iframeDoc.getElementById("problema-sim")?.checked ? iframeDoc.getElementById("problema-sim").value :
+            iframeDoc.getElementById("problema-nao")?.checked ? iframeDoc.getElementById("problema-nao").value :
+                "";
+        const severidade = iframeDoc.getElementById("gravidade")?.value || "";
+        const comentarios = iframeDoc.getElementById("comentarios")?.value || "";
+
+        // Check if the form has any meaningful data
+        if (!problema && !severidade && !comentarios) {
+            return null; // Return null if the form is empty
+        }
+
+        return { problema, severidade, comentarios };
+    }
+
+    // Collect data from each iframe dynamically
+    const data = {
+        inicio: {
+            tarefa: window.parent.tarefaVar,
+            googleLink: window.parent.googleFormsVar
+        }
+    };
+
+    Object.keys(iframeGroups).forEach(group => {
+        const groupData = {};
+        // qKey -> em que frame estamos
+        Object.keys(iframeGroups[group]).forEach(qKey => {
+            const formData = getFormData(iframeGroups[group][qKey], qKey);
+            if (formData) { // Only include non-empty forms
+                groupData[qKey] = formData;
+            }
+        });
+
+        if (Object.keys(groupData).length > 0) { // Only include groups with data
+            data[`passo${group}`] = groupData;
+        }
+    });
+    alert(JSON.stringify(data, null, 2));
+    writeStats(data, data.inicio.googleLink);
+}
 
 
 function writeStats(data, url) {
+
     const regex = /\/\w+\//g;
     const matches = url.match(regex);
     const sheet_id = matches[1].slice(1, -1);
 
-    createNewSheet(sheet_id).then(() => {
-        fillSheet(data, sheet_id);
-    }).catch(error => {
-        console.error("Error creating sheet:", error);
+    const token = localStorage.getItem("access_token");
+    loadGapiWithAuth(token).then(() => {
+        createNewSheet(sheet_id).then(() => {
+            fillSheet(data, sheet_id);
+        }).catch(error => {
+            alert("Error creating sheet:" + error.message);
+        });
+    })
+}
+
+// GAPI
+function loadGapiWithAuth(accessToken) {
+    return new Promise((resolve, reject) => {
+        if (!accessToken) {
+            alert("Não há access token");
+            return reject("Sem token");
+        }
+        alert("BNOAS")
+        gapi.load("client", () => {
+            gapi.client.init({
+                apiKey: window.parent.SHEET_API_KEY,
+                discoveryDocs: ["https://sheets.googleapis.com/$discovery/rest?version=v4"]
+            }).then(() => {
+                gapi.client.setToken({ access_token: accessToken });
+
+                return gapi.client.load("sheets", "v4");
+            }).then(() => {
+                alert("GAPI Loaded, Authenticated & Sheets API Ready!");
+                resolve(); // 👈 GAPI e Sheets prontos
+            }).catch(error => {
+                alert("Erro ao inicializar GAPI: " + error.message);
+                reject(error);
+            });
+        });
     });
 }
+
 
 function createNewSheet(sheetId) {
     return new Promise((resolve, reject) => {
@@ -585,28 +571,6 @@ function applyFormattingRed(spreadsheetId, sheetName, startRow, endRow, startCol
 
 
 
-
-
-
-// GAPI
-function loadGapiWithAuth(accessToken) {
-    if (accessToken) {
-        gapi.load("client", () => {
-            gapi.client.init({
-                apiKey: window.env.SHEET_API_KEY,
-                discoveryDocs: ["https://sheets.googleapis.com/$discovery/rest?version=v4"]
-            }).then(() => {
-                gapi.client.setToken({ access_token: accessToken });
-                console.log("GAPI Loaded & Authenticated!");
-            }).catch(error => {
-                console.log("Error initializing GAPI:", error);
-            });
-        });
-    }
-    else {
-        console.log("Nao ha access token")
-    }
-}
 
 
 
