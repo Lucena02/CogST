@@ -8,7 +8,7 @@ function checkProblema() {
     const problema = document.querySelector('input[name="problema"]:checked');
     const severidade = document.getElementById("severidade");
 
-    if (problema && problema.value === "Sim") {
+    if (problema && problema.value === "Não") {
         severidade.style.display = "flex"
     } else {
         severidade.style.display = "none"

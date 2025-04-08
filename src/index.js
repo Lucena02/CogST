@@ -375,9 +375,10 @@ function writeStats(data, url) {
     const sheet_id = matches[1].slice(1, -1);
 
     const token = localStorage.getItem("access_token");
+    const username = localStorage.getItem('nome_user')
     loadGapiWithAuth(token).then(() => {
-        createNewSheet(sheet_id).then(() => {
-            fillSheet(data, sheet_id);
+        createNewSheet(sheet_id, username).then(() => {
+            fillSheet(data, sheet_id)
         }).catch(error => {
             alert("Error creating sheet:" + error.message);
         });
@@ -412,9 +413,8 @@ function loadGapiWithAuth(accessToken) {
 }
 
 
-function createNewSheet(sheetId) {
+function createNewSheet(sheetId, sheetName) {
     return new Promise((resolve, reject) => {
-        let userName = localStorage.getItem('nome_user');
 
         gapi.client.sheets.spreadsheets.batchUpdate({
             spreadsheetId: sheetId,
@@ -422,7 +422,7 @@ function createNewSheet(sheetId) {
                 {
                     addSheet: {
                         properties: {
-                            title: userName
+                            title: sheetName
                         }
                     }
                 }
@@ -430,7 +430,7 @@ function createNewSheet(sheetId) {
         }).then((response) => {
             if (response.result.replies) {
                 alert("New sheet created!", response);
-                resolve(userName); // Retorna o nome da aba criada
+                resolve(sheetName); // Retorna o nome da aba criada
             } else {
                 alert("Erro")
                 reject("Sheet creation failed");
@@ -444,19 +444,43 @@ function createNewSheet(sheetId) {
 
 
 function fillSheet(data, spreadsheetId) {
+    const tamanho = Object.keys(data).length
     const sheetName = localStorage.getItem('nome_user'); // Get the sheet name
-    const range = `${sheetName}!B1:E1`;
+    const range = `${sheetName}!A1:E${tamanho}`;
     const valueInputOption = "RAW";
 
     const values = [
         [
+            "",
             "O utilizador vai \ntentar executar a \nação correta?",
             "O utilizador percebe \nque a ação correta \nestá disponível?",
             "O utilizador associará\n a ação correta com\n o resultado esperado?",
             "O utilizador receberá\n feedback adequado e\n perceberá que está\n a avançar na sua tarefa?"
         ]
     ];
+    Object.keys(data).forEach(key => {
+        if (key.startsWith("passo")) {
+            const passo = data[key];
+            let array = []
+            array.push(passo["q0"]["passoDescricao"])
+            for (j = 1; j <= 4; j++) {
+                if (passo["q" + j]["problema"] == "" || passo["q" + j]["problema"] == "Sim") {
+                    array.push(
+                        `Sim\nComentários: ${passo["q" + j]["comentarios"]}`
+                    );
+                }
+                else {
+                    array.push(
+                        `Não (Severidade: ${passo["q" + j]["severidade"]})\nComentários: ${passo["q" + j]["comentarios"]}`
+                    );
+                }
 
+            }
+
+            values.push(array)
+        }
+    });
+    alert(JSON.stringify(values, null, 2))
     const body = { values: values };
 
     // First, update cell values
@@ -466,13 +490,13 @@ function fillSheet(data, spreadsheetId) {
         valueInputOption: valueInputOption,
         resource: body,
     }).then((response) => {
-        console.log(`${response.result.updatedCells} cells updated.`);
 
         // Now, update background color, text formatting, and column width
         applyFormatting(spreadsheetId, sheetName);
-
+        applyConditionalFormatting(spreadsheetId, sheetName)
+        fillRelatorio(spreadsheetId)
     }).catch(error => {
-        alert("Erro ao preencher a planilha:" + JSON.stringify(error));
+        alert("Erro ao preencher a planilha:" + error.message);
     });
 }
 
@@ -531,43 +555,164 @@ function applyFormatting(spreadsheetId, sheetName) {
 }
 
 
-function applyFormattingRed(spreadsheetId, sheetName, startRow, endRow, startCol, endCol) {
-    gapi.client.sheets.spreadsheets.get({ spreadsheetId: spreadsheetId }).then((response) => {
-        const sheetId = response.result.sheets.find(sheet => sheet.properties.title === sheetName).properties.sheetId;
+async function fillRelatorio(sheetID) {
 
-        const requests = [
-            {
-                repeatCell: {
-                    range: {
-                        sheetId: sheetId,
-                        startRowIndex: startRow,
-                        endRowIndex: endRow,
-                        startColumnIndex: startCol,
-                        endColumnIndex: endCol
-                    },
-                    cell: {
-                        userEnteredFormat: {
-                            backgroundColor: { red: 0.88, green: 0.0, blue: 0.0 },
-                            horizontalAlignment: "CENTER"
-                        }
-                    },
-                    fields: "userEnteredFormat(backgroundColor,horizontalAlignment)"
-                }
-            }
-        ];
+    const metadataResponse = await gapi.client.sheets.spreadsheets.get({
+        spreadsheetId: sheetID
+    });
 
-        return gapi.client.sheets.spreadsheets.batchUpdate({
-            spreadsheetId: spreadsheetId,
-            resource: { requests: requests }
+    const sheets = metadataResponse.result.sheets;
+    const allSheetData = {};
+
+    // Iterar sobre todas as folhas e buscar os dados
+    for (const sheet of sheets) {
+        const sheetName = sheet.properties.title;
+
+        const response = await gapi.client.sheets.spreadsheets.values.get({
+            spreadsheetId: sheetID,
+            range: `${sheetName}`
         });
 
-    }).then((response) => {
-        console.log("Formatting applied successfully:", response);
+        allSheetData[sheetName] = response.result.values || [];
+    }
+
+    alert("Todos os dados da planilha:" + JSON.stringify(allSheetData, null, 2));
+
+    let informacoes = {}
+    Object.keys(allSheetData).forEach(key => {
+        const sheet = allSheetData[key]
+        if (sheet && sheet.length > 1) {
+            for (let i = 1; i < sheet.length; i++) {
+                const nomePasso = sheet[i][0];
+
+                if (!(nomePasso in informacoes)) {
+                    informacoes[nomePasso] = [0, 0, 0, 0];
+                }
+                for (let j = 1; j < 5; j++) {
+                    if (sheet[i][j].startsWith("Não")) {
+                        informacoes[sheet[i][0]][j - 1] += 1
+                    }
+
+                }
+            }
+        }
+    })
+
+    alert("INFO: " + JSON.stringify(informacoes))
+    createNewSheet(sheetID, "Relatorio").then(() => {
+        fillRelatorioAux(informacoes, sheetID)
     }).catch(error => {
-        console.error("Error applying formatting:", error);
+        alert("Erro a criar a Spreadsheet dos relatórios: " + error.message)
+    })
+}
+
+
+function fillRelatorioAux(data, spreadsheetId) {
+    const tamanho = (Object.keys(data).length) + 1
+    const range = `Relatorio!A1:E${tamanho}`;
+    const valueInputOption = "RAW";
+
+    const values = [
+        [
+            "",
+            "O utilizador vai \ntentar executar a \nação correta?",
+            "O utilizador percebe \nque a ação correta \nestá disponível?",
+            "O utilizador associará\n a ação correta com\n o resultado esperado?",
+            "O utilizador receberá\n feedback adequado e\n perceberá que está\n a avançar na sua tarefa?"
+        ]
+    ];
+
+    Object.keys(data).forEach(key => {
+        data[key].unshift(key)
+        values.push(data[key])
+    })
+
+    alert(JSON.stringify(values, null, 2))
+    const body = { values: values };
+
+    // First, update cell values
+    gapi.client.sheets.spreadsheets.values.update({
+        spreadsheetId: spreadsheetId,
+        range: range,
+        valueInputOption: valueInputOption,
+        resource: body,
+    }).then((response) => {
+        applyFormatting(spreadsheetId, "Relatorio");
+    }).catch(error => {
+        alert("Erro ao preencher o relatorio:" + error.message);
     });
 }
 
+function applyConditionalFormatting(sheetId, sheetName) {
+    const range = `${sheetName}!A1:E2`;  // Defina o intervalo diretamente
+
+    const requests = [
+        {
+            "addConditionalFormatRule": {
+                "rule": {
+                    "ranges": [
+                        {
+                            "sheetId": sheetId,
+                            "startRowIndex": 0,
+                            "endRowIndex": 100,
+                            "startColumnIndex": 0,
+                            "endColumnIndex": 1
+                        }
+                    ],
+                    "booleanRule": {
+                        "condition": {
+                            "type": "TEXT_CONTAINS",
+                            "values": [
+                                { "userEnteredValue": "Sim" }
+                            ]
+                        },
+                        "format": {
+                            "backgroundColor": { "red": 0.0, "green": 0.4, "blue": 0.0 }
+                        }
+                    }
+                },
+                "index": 0
+            }
+        },
+        {
+            "addConditionalFormatRule": {
+                "rule": {
+                    "ranges": [
+                        {
+                            "sheetId": sheetId,
+                            "startRowIndex": 0,
+                            "endRowIndex": 100,
+                            "startColumnIndex": 0,
+                            "endColumnIndex": 1
+                        }
+                    ],
+                    "booleanRule": {
+                        "condition": {
+                            "type": "TEXT_CONTAINS",
+                            "values": [
+                                { "userEnteredValue": "Não" }
+                            ]
+                        },
+                        "format": {
+                            "backgroundColor": { "red": 0.4, "green": 0.0, "blue": 0.0 }
+                        }
+                    }
+                },
+                "index": 1
+            }
+        }
+    ];
+
+    // Aplicando a formatação condicional à planilha
+    gapi.client.sheets.spreadsheets.batchUpdate({
+        spreadsheetId: sheetId,
+        requests: requests
+    }).then((response) => {
+        console.log('Conditional formatting applied successfully:', response);
+    }, (error) => {
+        console.error('Error applying conditional formatting:', error);
+    });
+}
 
 
 
