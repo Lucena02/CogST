@@ -392,7 +392,6 @@ function loadGapiWithAuth(accessToken) {
             alert("Não há access token");
             return reject("Sem token");
         }
-        alert("BNOAS")
         gapi.load("client", () => {
             gapi.client.init({
                 apiKey: window.parent.SHEET_API_KEY,
@@ -429,7 +428,6 @@ function createNewSheet(sheetId, sheetName) {
             ]
         }).then((response) => {
             if (response.result.replies) {
-                alert("New sheet created!", response);
                 resolve(sheetName); // Retorna o nome da aba criada
             } else {
                 alert("Erro")
@@ -480,7 +478,7 @@ function fillSheet(data, spreadsheetId) {
             values.push(array)
         }
     });
-    alert(JSON.stringify(values, null, 2))
+
     const body = { values: values };
 
     // First, update cell values
@@ -555,6 +553,31 @@ function applyFormatting(spreadsheetId, sheetName) {
 }
 
 
+function cellToSeveridade(cell){
+    const regex = /\(Severidade: ([\w\s]+)\)/;
+    const match = cell.match(regex);
+    if (match && match[1]) {
+        alert(match[1])
+        
+        switch (match[1]){
+            case "Muito Pequena":
+                return 1
+            case "Pequena":
+                return 2
+            case "Normal":
+                return 3
+            case "Grave":
+                return 4
+            case "Muito Grave":
+                return 5
+        }
+    }
+    else {
+        return 0
+    }
+}
+
+
 async function fillRelatorio(sheetID) {
 
     const metadataResponse = await gapi.client.sheets.spreadsheets.get({
@@ -564,7 +587,6 @@ async function fillRelatorio(sheetID) {
     const sheets = metadataResponse.result.sheets;
     const allSheetData = {};
 
-    // Iterar sobre todas as folhas e buscar os dados
     for (const sheet of sheets) {
         const sheetName = sheet.properties.title;
 
@@ -576,9 +598,9 @@ async function fillRelatorio(sheetID) {
         allSheetData[sheetName] = response.result.values || [];
     }
 
-    alert("Todos os dados da planilha:" + JSON.stringify(allSheetData, null, 2));
-
     let informacoes = {}
+    let severidade = {}
+    const numeroEvals = Object.keys(allSheetData).length - 1 // Obter o total de páginas para fazer a média
     Object.keys(allSheetData).forEach(key => {
         const sheet = allSheetData[key]
         if (sheet && sheet.length > 1) {
@@ -587,27 +609,36 @@ async function fillRelatorio(sheetID) {
 
                 if (!(nomePasso in informacoes)) {
                     informacoes[nomePasso] = [0, 0, 0, 0];
+                    severidade[nomePasso] = [0, 0, 0, 0];
                 }
                 for (let j = 1; j < 5; j++) {
                     if (sheet[i][j].startsWith("Não")) {
                         informacoes[sheet[i][0]][j - 1] += 1
+                        severidade[sheet[i][0]][j - 1] += cellToSeveridade(sheet[i][j])
                     }
 
                 }
             }
         }
     })
-
     alert("INFO: " + JSON.stringify(informacoes))
+    alert("Severidade: " + JSON.stringify(severidade))
+    Object.keys(severidade).forEach(key => {
+        for(let i = 0; i < 4; i++){
+            severidade[key][i] = (severidade[key][i])/numeroEvals
+        }
+    })
+    alert("Severidade Média: " + JSON.stringify(severidade))
+
     createNewSheet(sheetID, "Relatorio").then(() => {
-        fillRelatorioAux(informacoes, sheetID)
+        fillRelatorioAux(informacoes, severidade, sheetID)
     }).catch(error => {
         alert("Erro a criar a Spreadsheet dos relatórios: " + error.message)
     })
 }
 
 
-function fillRelatorioAux(data, spreadsheetId) {
+function fillRelatorioAux(data, severidade, spreadsheetId) {
     const tamanho = (Object.keys(data).length) + 1
     const range = `Relatorio!A1:E${tamanho}`;
     const valueInputOption = "RAW";
@@ -623,6 +654,9 @@ function fillRelatorioAux(data, spreadsheetId) {
     ];
 
     Object.keys(data).forEach(key => {
+        for (let i = 0; i < 4; i++){
+            data[key][i] = (data[key][i]).toString() + " (Severidade Média - " + (severidade[key][i]).toString() + ")"
+        }
         data[key].unshift(key)
         values.push(data[key])
     })
