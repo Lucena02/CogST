@@ -1,0 +1,112 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>CogST - Definir CW</title>
+    <link rel="stylesheet" href="definirCW.css">
+    <script src="https://apis.google.com/js/api.js"></script>
+    <!-- Add Lucide Icons -->
+    <script src="https://unpkg.com/lucide@latest"></script>
+</head>
+
+<body>
+    <div class="tab" id="sidebarTab">
+        <button onclick="resizeWindow()" class="leftArrow" id="seta">
+            <i data-lucide="chevron-right" id="toggleIcon"></i>
+        </button>
+        <div class="container" id="contentA">
+            <div class="content" id="contentFrame">
+                <div class="header">
+                    <div class="cogst">
+                        CogST
+                    </div>
+                    <a href="#" class="help" title="Help">
+                        <i data-lucide="help-circle"></i>
+                    </a>
+                </div>
+
+                <div class="form-section">
+                    <h3 class="section-title">Definir CW</h3>
+
+                    <form id="form-inicio" class="cw-form">
+                        <div class="form-group">
+                            <label for="tarefa">Tarefa a realizar</label>
+                            <textarea id="tarefa" rows="3"></textarea>
+                        </div>
+
+                        <div class="form-group">
+                            <label for="google-link">Google Sheets Link</label>
+                            <textarea id="google-link" rows="1"></textarea>
+                        </div>
+
+                        <div class="form-group">
+                            <label for="persona">Definir Persona</label>
+                            <textarea id="persona" rows="1"></textarea>
+                        </div>
+                    </form>
+
+                    <div class="navigation-buttons">
+                        <button onclick="retrocederCW()" class="btn btn-secondary">
+                            <i data-lucide="arrow-left"></i>
+                            Retroceder
+                        </button>
+
+                        <button onclick="toPassos()" class="btn btn-primary">
+                            Definir passos
+                            <i data-lucide="arrow-right"></i>
+                        </button>
+                    </div>
+                </div>
+            </div>
+
+            <iframe src="definirPassos.html" class="passos" frameborder="0" id="passosFrame"></iframe>
+
+            <div id="botoesTesteRetroceder" class="back-buttons">
+                <button onclick="retrocedePassos()" class="btn btn-secondary">
+                    <i data-lucide="arrow-left"></i>
+                    Definir CW
+                </button>
+            </div>
+
+            <div id="botaoFim" class="export-button">
+                <button onclick="exportPassos()" class="btn btn-success">
+                    <i data-lucide="save"></i>
+                    Salvar e Exportar
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <script src="login.js"></script>
+    <script>
+        lucide.createIcons();
+
+        let isExpanded = true;
+        const toggleButton = document.getElementById('toggleButton');
+        const sidebarTab = document.getElementById('sidebarTab');
+        const toggleIcon = document.getElementById('toggleIcon');
+        const contentContainer = document.getElementById('contentA');
+
+        function resizeWindow() {
+            isExpanded = !isExpanded;
+
+            if (isExpanded) {
+                sidebarTab.style.width = 'var(--tab-width)';
+                contentContainer.style.opacity = '1';
+                contentContainer.style.width = '90%';
+                toggleIcon.setAttribute('name', 'chevron-right');
+            } else {
+                sidebarTab.style.width = 'var(--collapsed-width)';
+                contentContainer.style.opacity = '0';
+                contentContainer.style.width = '0';
+                toggleIcon.setAttribute('name', 'chevron-left');
+            }
+        }
+
+        toggleButton.addEventListener('click', resizeWindow);
+    </script>
+</body>
+
+</html>

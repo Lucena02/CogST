@@ -5,7 +5,7 @@ let flag = 0;
 let passoIndex = 1;
 
 
-function addNewForm() {
+function addNewForm(flag) {
     const container = document.getElementById('formsContainer');
     const div = document.createElement('div');
     div.classList.add('itemPasso');
@@ -14,7 +14,7 @@ function addNewForm() {
             <p id="passoDesc${passoIndex}" class="passoDescOverflow">Passo ${passoIndex}</p>
             <div class="botaoContainer">
                 <button onclick="removeForm(${passoIndex})" class="botaoPreencher"> <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-trash-2"><path d="M3 6h18"/><path d="M19 6v14c0 1-1 2-2 2H7c-1 0-2-1-2-2V6"/><path d="M8 6V4c0-1 1-2 2-2h4c1 0 2 1 2 2v2"/><line x1="10" x2="10" y1="11" y2="17"/><line x1="14" x2="14" y1="11" y2="17"/></svg></i> </button>
-                <button onclick="executeWalkthrough(${passoIndex})"class="botaoPreencher"><svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-arrow-right"><path d="M5 12h14"/><path d="m12 5 7 7-7 7"/></svg></button>
+                <button onclick="executeWalkthrough(${passoIndex}, ${flag})"class="botaoPreencher"><svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-arrow-right"><path d="M5 12h14"/><path d="m12 5 7 7-7 7"/></svg></button>
             </div>
     `;
     container.appendChild(div);
@@ -22,15 +22,23 @@ function addNewForm() {
 }
 
 function addNewFormArgumento(passoIndexBom, passoDesc) {
+
+    const iframe = document.getElementById("passosFrame");
+    const iframeDoc = iframe.contentDocument || iframe.contentWindow.document;
+
+    const container = iframeDoc.getElementById('formsContainer');
+    if (!container) {
+        alert("Nao encontrei o container")
+        return;
+    }
+
     if (passoDesc == undefined) passoDesc = "Passo " + passoIndexBom
-    const container = document.getElementById('formsContainer');
     const div = document.createElement('div');
     div.classList.add('itemPasso');
     div.id = "passo" + passoIndexBom;
     div.innerHTML = `
             <p id="passoDesc${passoIndexBom}" class="passoDescOverflow">${passoDesc}</p>
             <div class="botaoContainer">
-                <button onclick="removeForm(${passoIndexBom})" class="botaoPreencher"> <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-trash-2"><path d="M3 6h18"/><path d="M19 6v14c0 1-1 2-2 2H7c-1 0-2-1-2-2V6"/><path d="M8 6V4c0-1 1-2 2-2h4c1 0 2 1 2 2v2"/><line x1="10" x2="10" y1="11" y2="17"/><line x1="14" x2="14" y1="11" y2="17"/></svg></i> </button>
                 <button onclick="executeWalkthrough(${passoIndexBom})"class="botaoPreencher"><svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-arrow-right"><path d="M5 12h14"/><path d="m12 5 7 7-7 7"/></svg></button>
             </div>
     `;
@@ -49,59 +57,31 @@ function importPassos() {
         reader.onload = function (event) {
             try {
                 const jsonData = JSON.parse(event.target.result);
-                while (passoIndex != 1) {
-                    removeForm(passoIndex - 1)
-                    passoIndex = passoIndex - 1
-                }
+                //while (passoIndex != 1) {
+                //    removeForm(passoIndex - 1)
+                //    passoIndex = passoIndex - 1
+                //}
                 for (const key in jsonData) {
-                    addNewFormArgumento(key, jsonData[key].nome)
+                    if (key != 0) {
+                        addNewFormArgumento(key, jsonData[key].nome)
+                    }
                 }
-                const keys = Object.keys(jsonData);
-                passoIndex = parseInt(keys[keys.length - 1]) + 1;
             } catch (e) {
                 alert("Erro ao parsear o JSON: " + e.message);
             }
         };
         reader.readAsText(file);
+        document.getElementById("contentFrame").style.display = "none"
+        document.getElementById("passosFrame").style.display = "flex"
     } else {
-        alert("Nenhum ficheiro selecionado.");
+        document.getElementById("error").innerHTML = "Nenhum arquivo importado";
     }
+
+
 }
 
 
-function exportPassos() {
-    const passosData = {};
-    document.querySelectorAll("div[id^='passo']").forEach(passooo => {
-        const match = passooo.id.match(/passo(\d+)/);
-        if (match) {
-            const [_, passo] = match;
 
-
-            if (!passosData[passo]) {
-                passosData[passo] = {};
-            }
-
-            const passoID = "passoDesc" + passo
-            alert(passoID)
-            const passoDescricao = passooo.querySelector(`#${passoID}`)?.textContent;
-            alert(passoDescricao)
-            passosData[passo].nome = passoDescricao;
-
-        }
-    });
-
-
-    const jsonData = JSON.stringify(passosData);
-
-
-    const blob = new Blob([jsonData], { type: "application/json" });
-    const a = document.createElement("a");
-    a.href = URL.createObjectURL(blob);
-    a.download = "passos.json";
-    document.body.appendChild(a);
-    a.click();
-    document.body.removeChild(a);
-}
 
 
 function putIframe(frame, passo) {
@@ -152,8 +132,8 @@ function removeForm(numeroPasso) {
 
 let state = 0
 
-
-function executeWalkthrough(indexPasso) {
+// 0 -> Modo criação; 1 -> Modo edição
+function executeWalkthrough(indexPasso, flag) {
     console.log("OLD STATE: " + state)
     const passos = document.getElementById("passos")
     const botoes = document.getElementById("botoes")
@@ -175,6 +155,7 @@ function executeWalkthrough(indexPasso) {
             const iframe0 = document.getElementById("iframe0" + indexPasso)
             iframe0.onload = function () {
                 iframe0.contentDocument.getElementById("passoDesc").innerHTML = document.getElementById("passoDesc" + indexPasso).innerHTML;
+                iframe0.contentDocument.getElementById("passoDesc").readOnly = true;
             };
         }
         else {
@@ -186,10 +167,21 @@ function executeWalkthrough(indexPasso) {
             const div = document.createElement('div');
             div.className = "botoes"
             div.id = "botoes" + indexPasso
-            div.innerHTML = `
-                    <button onclick="backWalkthrough(${indexPasso})" class="botao">Retroceder</button>
-                    <button onclick="executeWalkthrough(${indexPasso})" class="botao" id="avançar">Avançar</button>
-            `;
+            if (flag == 0) {
+                div.innerHTML = `
+                <button onclick="backWalkthrough(${indexPasso}, ${flag})" class="botao">Retroceder</button>
+                `;
+
+                // document.getElementById("botoesTesteRetroceder").style.display = "none"
+
+            }
+            else {
+                div.innerHTML = `
+                <button onclick="backWalkthrough(${indexPasso}, ${flag})" class="botao">Retroceder</button>
+                <button onclick="executeWalkthrough(${indexPasso}, ${flag})" class="botao" id="avançar">Avançar</button>
+                `;
+            }
+
             botoes.appendChild(div);
 
 
@@ -279,11 +271,10 @@ function backWalkthrough(indexPasso) {
             nomePasso.innerHTML = iframe0.contentDocument.getElementById("passoDesc")?.value
         }
         botoesIndex.style.display = "none"
-        botoes.style.display = "none"
         passos.style.display = "flex"
         iframe0.style.display = "none"
+        botoes.style.display = "none"
     }
-
     if (state == 2) {
         iframe0.style.display = "flex"
         iframe1.style.display = "none"
@@ -553,13 +544,13 @@ function applyFormatting(spreadsheetId, sheetName) {
 }
 
 
-function cellToSeveridade(cell){
+function cellToSeveridade(cell) {
     const regex = /\(Severidade: ([\w\s]+)\)/;
     const match = cell.match(regex);
     if (match && match[1]) {
         alert(match[1])
-        
-        switch (match[1]){
+
+        switch (match[1]) {
             case "Muito Pequena":
                 return 1
             case "Pequena":
@@ -624,8 +615,8 @@ async function fillRelatorio(sheetID) {
     alert("INFO: " + JSON.stringify(informacoes))
     alert("Severidade: " + JSON.stringify(severidade))
     Object.keys(severidade).forEach(key => {
-        for(let i = 0; i < 4; i++){
-            severidade[key][i] = (severidade[key][i])/numeroEvals
+        for (let i = 0; i < 4; i++) {
+            severidade[key][i] = (severidade[key][i]) / numeroEvals
         }
     })
     alert("Severidade Média: " + JSON.stringify(severidade))
@@ -654,7 +645,7 @@ function fillRelatorioAux(data, severidade, spreadsheetId) {
     ];
 
     Object.keys(data).forEach(key => {
-        for (let i = 0; i < 4; i++){
+        for (let i = 0; i < 4; i++) {
             data[key][i] = (data[key][i]).toString() + " (Severidade Média - " + (severidade[key][i]).toString() + ")"
         }
         data[key].unshift(key)
@@ -753,6 +744,7 @@ function applyConditionalFormatting(sheetId, sheetName) {
 
 
 
-
-
+function retrocedeCW2() {
+    window.electronAPI.send("start-main-app");
+}
 

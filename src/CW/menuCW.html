@@ -1,0 +1,55 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>CogST</title>
+    <link rel="stylesheet" href="index.css">
+    <script src="https://apis.google.com/js/api.js"></script>
+    <!-- Add Lucide Icons -->
+    <script src="https://unpkg.com/lucide@latest"></script>
+</head>
+
+<body>
+    <div class="tab" id="sidebarTab">
+        <button class="leftArrow" id="toggleButton">
+            <i id="toggleIcon" data-lucide="chevron-right"></i>
+        </button>
+        <div class="container" id="contentContainer">
+            <div class="content">
+                <div class="header">
+                    <div class="cogst">
+                        CogST
+                    </div>
+                    <a href="#" class="help" title="Help">
+                        <i data-lucide="help-circle"></i>
+                    </a>
+                </div>
+
+                <div class="buttons-container">
+                    <button onclick="definirCW()" class="action-button">
+                        <i data-lucide="settings"></i>
+                        <span>Definir CW</span>
+                    </button>
+
+                    <button onclick="preencherCW()" class="action-button">
+                        <i data-lucide="file-text"></i>
+                        <span>Preencher CW</span>
+                    </button>
+
+                    <button onclick="login()" class="action-button">
+                        <i data-lucide="log-in"></i>
+                        <span id="login">Login</span>
+                    </button>
+                </div>
+
+                <div id="error" class="error"></div>
+            </div>
+        </div>
+    </div>
+
+    <script src="login.js"></script>
+</body>
+
+</html>

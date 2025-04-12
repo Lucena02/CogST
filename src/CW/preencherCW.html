@@ -1,0 +1,95 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Overlay</title>
+    <link rel="stylesheet" href="index.css">
+    <link rel="stylesheet" href="preencherCW.css">
+    <script src="https://apis.google.com/js/api.js"></script>
+    <!-- Add Lucide Icons -->
+    <script src="https://unpkg.com/lucide@latest"></script>
+</head>
+
+<body>
+    <div class="tab" id="sidebarTab">
+        <button onclick="resizeWindow()" class="leftArrow" id="seta">
+            <i data-lucide="chevron-right" id="toggleIcon"></i>
+        </button>
+        <div class="container2" id="contentA">
+            <div class="content" id="contentFrame">
+                <div class="header">
+                    <div class="cogst">
+                        CogST
+                    </div>
+                    <a href="#" class="help" title="Help">
+                        <i data-lucide="help-circle"></i>
+                    </a>
+                </div>
+
+                <div class="file-input-container">
+                    <div class="file-input-wrapper">
+                        <input type="file" id="fileInput">
+                    </div>
+                    <div id="feedbackImportar" class="feedback-text">Nenhum arquivo selecionado</div>
+                </div>
+
+                <!-- Import button -->
+                <div id="botoesImportar" class="botoesImportar">
+                    <button onclick="importPassos()" id="importButton">Importar e Começar</button>
+                </div>
+
+                <!-- Error message -->
+                <div id="error" class="error">
+                    <!-- Error messages will appear here -->
+                </div>
+
+            </div>
+            <iframe src="passos.html" class="passos" frameborder="0" id="passosFrame"></iframe>
+            <div id="recuar" class="back-buttons">
+                <button onclick="retrocedeCW2()" class="btn btn-secondary">
+                    <i data-lucide="arrow-left"></i>
+                    Retroceder
+                </button>
+            </div>
+
+        </div>
+
+
+    </div>
+
+    <script src="index.js"></script>
+    <script src="passos.js"></script>
+    <script>
+        lucide.createIcons();
+
+        let isExpanded = true;
+        const toggleButton = document.getElementById('toggleButton');
+        const sidebarTab = document.getElementById('sidebarTab');
+        const toggleIcon = document.getElementById('toggleIcon');
+        const contentContainer = document.getElementById('contentA');
+
+        function resizeWindow() {
+            isExpanded = !isExpanded;
+
+            if (isExpanded) {
+                sidebarTab.style.width = 'var(--tab-width)';
+                contentContainer.style.opacity = '1';
+                contentContainer.style.width = '90%';
+                toggleIcon.setAttribute('name', 'chevron-right');
+            } else {
+                sidebarTab.style.width = 'var(--collapsed-width)';
+                contentContainer.style.opacity = '0';
+                contentContainer.style.width = '0';
+                toggleIcon.setAttribute('name', 'chevron-left');
+            }
+        }
+
+        toggleButton.addEventListener('click', resizeWindow);
+
+
+    </script>
+</body>
+
+</html>

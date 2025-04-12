@@ -8,8 +8,6 @@ const express = require("express");
 let win;
 app.whenReady().then(() => {
     const { width, height } = screen.getPrimaryDisplay().bounds;
-    console.log(parseInt(process.env.WIDTH));
-    console.log(process.env.HEIGHT);
     win = new BrowserWindow({
         width: parseInt(process.env.WIDTH),
         height: parseInt(process.env.HEIGHT),
@@ -28,7 +26,7 @@ app.whenReady().then(() => {
     });
 
     win.setIgnoreMouseEvents(false); // Allows clicks to pass through
-    win.loadFile("src/index.html");
+    win.loadFile("src/menu.html");
 
 
 
@@ -41,7 +39,23 @@ ipcMain.on("login", (event) => {
     authenticateUser();
 });
 
+ipcMain.on("start-main-app", () => {
+    if (win) {
+        win.loadFile("src/CW/menuCW.html");
+    }
+});
 
+ipcMain.on("definir-CW", () => {
+    if (win) {
+        win.loadFile("src/CW/definirCW.html");
+    }
+});
+
+ipcMain.on("preencher-CW", () => {
+    if (win) {
+        win.loadFile("src/CW/preencherCW.html");
+    }
+});
 
 
 ipcMain.on("update-window-width", (event, newWidth) => {
@@ -55,6 +69,19 @@ ipcMain.on("update-window-width", (event, newWidth) => {
     }
 });
 
+
+ipcMain.handle('show-confirmation-dialog', async (event, options) => {
+    const win = BrowserWindow.getFocusedWindow();
+    const result = await dialog.showMessageBox(win, {
+        type: "warning",
+        buttons: options.buttons || ["Cancelar", "Sim"],
+        defaultId: 0,
+        cancelId: 0,
+        title: options.title || "Confirmar",
+        message: options.message || "Tem a certeza?",
+    });
+    return result.response; // 0 = Cancel, 1 = Yes
+});
 
 
 
@@ -110,3 +137,4 @@ app2.get('/', async (req, res) => {
 app2.listen(3000, () => {
     console.log('Listening on http://localhost:3000');
 });
+

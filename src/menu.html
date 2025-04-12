@@ -1,0 +1,22 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <link rel="stylesheet" href="menu.css">
+</head>
+
+<body>
+    <div class="container">
+        <h1>Avaliação de<br>Usabilidade</h1>
+        <button id="startBtn">Fazer CW</button>
+        <button>Avaliar Responsividade</button>
+    </div>
+
+    <script>
+        document.getElementById('startBtn').addEventListener('click', () => {
+            window.electronAPI.send('start-main-app');
+        });
+    </script>
+</body>
+
+</html>

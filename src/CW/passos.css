@@ -1,13 +1,13 @@
 @font-face {
     font-family: 'Roboto';
-    src: url('../public/fonts/Roboto-Bold.ttf');
+    src: url('../../public/fonts/Roboto-Bold.ttf');
     font-weight: bold;
     font-style: normal;
 }
 
 @font-face {
     font-family: 'Roboto';
-    src: url('../public/fonts/Roboto-Regular.ttf');
+    src: url('../../public/fonts/Roboto-Regular.ttf');
     font-weight: normal;
     font-style: normal;
 }
@@ -83,6 +83,12 @@ body {
     width: 100%;
 }
 
+.iframe0 {
+    display: flex;
+    width: 100%;
+    height: 100%;
+}
+
 .iframe1 {
     display: flex;
     width: 100%;
@@ -108,7 +114,7 @@ body {
 }
 
 .botoesContainer {
-    height: 100%;
+    height: 20%;
     display: flex;
     justify-content: center;
 }
@@ -138,4 +144,39 @@ body {
 input[type='file'] {
     width: 115px;
     overflow: hidden;
+}
+
+.passosTitulo {
+    display: flex;
+}
+
+
+
+.btn {
+    height: 80%;
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    padding: 8px 12px;
+    border-radius: 4px;
+    font-family: "Roboto", sans-serif;
+    font-size: 14px;
+    font-weight: 500;
+    cursor: pointer;
+    transition: background-color var(--transition-speed), border-color var(--transition-speed);
+    border: 1px solid transparent;
+}
+
+.btn svg {
+    width: 16px;
+    height: 16px;
+}
+
+.btn-success {
+    background-color: #10b981;
+    color: white;
+}
+
+.btn-success:hover {
+    background-color: #059669;
 }
