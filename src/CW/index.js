@@ -21,7 +21,7 @@ function addNewForm(flag) {
     passoIndex += 1
 }
 
-function addNewFormArgumento(passoIndexBom, passoDesc) {
+function addNewFormArgumento(passoIndexBom, passoDesc, flag) {
 
     const iframe = document.getElementById("passosFrame");
     const iframeDoc = iframe.contentDocument || iframe.contentWindow.document;
@@ -39,7 +39,7 @@ function addNewFormArgumento(passoIndexBom, passoDesc) {
     div.innerHTML = `
             <p id="passoDesc${passoIndexBom}" class="passoDescOverflow">${passoDesc}</p>
             <div class="botaoContainer">
-                <button onclick="executeWalkthrough(${passoIndexBom})"class="botaoPreencher"><svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-arrow-right"><path d="M5 12h14"/><path d="m12 5 7 7-7 7"/></svg></button>
+                <button onclick="executeWalkthrough(${passoIndexBom}, ${flag})"class="botaoPreencher"><svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-arrow-right"><path d="M5 12h14"/><path d="m12 5 7 7-7 7"/></svg></button>
             </div>
     `;
     container.appendChild(div);
@@ -63,21 +63,28 @@ function importPassos() {
                 //}
                 for (const key in jsonData) {
                     if (key != 0) {
-                        addNewFormArgumento(key, jsonData[key].nome)
+                        addNewFormArgumento(key, jsonData[key].nome, 1)
                     }
                 }
+                const iframe = document.getElementById("passosFrame");
+                const iframeDoc = iframe.contentDocument || iframe.contentWindow.document;
+
+                iframeDoc.getElementById("personaSpot").value = jsonData[0].persona;
+                iframeDoc.getElementById("tarefaSpot").value = jsonData[0].tarefa;
+                window.googleFormsVar = jsonData[0].googleLink
             } catch (e) {
                 alert("Erro ao parsear o JSON: " + e.message);
             }
         };
         reader.readAsText(file);
+
+
         document.getElementById("contentFrame").style.display = "none"
         document.getElementById("passosFrame").style.display = "flex"
+
     } else {
         document.getElementById("error").innerHTML = "Nenhum arquivo importado";
     }
-
-
 }
 
 
@@ -155,7 +162,10 @@ function executeWalkthrough(indexPasso, flag) {
             const iframe0 = document.getElementById("iframe0" + indexPasso)
             iframe0.onload = function () {
                 iframe0.contentDocument.getElementById("passoDesc").innerHTML = document.getElementById("passoDesc" + indexPasso).innerHTML;
-                iframe0.contentDocument.getElementById("passoDesc").readOnly = true;
+                if (flag == 1) {
+                    iframe0.contentDocument.getElementById("passoDesc").readOnly = true;
+                }
+
             };
         }
         else {
@@ -331,11 +341,12 @@ function collectFormData() {
 
         return { problema, severidade, comentarios };
     }
-
+    alert(document.getElementById("tarefaSpot").value,)
+    alert(window.parent.googleFormsVar)
     // Collect data from each iframe dynamically
     const data = {
         inicio: {
-            tarefa: window.parent.tarefaVar,
+            tarefa: document.getElementById("tarefaSpot").value,
             googleLink: window.parent.googleFormsVar
         }
     };
@@ -744,7 +755,16 @@ function applyConditionalFormatting(sheetId, sheetName) {
 
 
 
-function retrocedeCW2() {
-    window.electronAPI.send("start-main-app");
+async function retrocedeCW2() {
+
+    const result = await window.electronAPI.showConfirmationDialog({
+        title: "Confirmar Retrocesso",
+        message: "Tem a certeza que quer retroceder? Todo o progresso será perdido.",
+        buttons: ["Cancelar", "Sim"]
+    });
+
+    if (result === 1) {
+        window.electronAPI.send("start-main-app");
+    }
 }
 

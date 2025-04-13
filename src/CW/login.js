@@ -140,9 +140,7 @@ function exportPassos() {
             }
 
             const passoID = "passoDesc" + passo
-            alert(passoID)
             const passoDescricao = passooo.querySelector(`#${passoID}`)?.textContent;
-            alert(passoDescricao)
             passosData[passo].nome = passoDescricao;
 
         }

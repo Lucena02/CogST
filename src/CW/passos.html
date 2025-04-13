@@ -15,6 +15,15 @@
 
     </div>
     <div class="containerPassos" id="passos">
+        <div class="topotopo">
+
+            <label style="font-weight: bold;">Tarefa: </label>
+            <textarea rows="1" cols="26" id="tarefaSpot" readonly></textarea>
+
+            <label style="font-weight: bold;">Persona: </label>
+            <textarea rows="1" cols="26" id="personaSpot" readonly></textarea>
+
+        </div>
         <div class="topo">
             <h1>Passos</h1>
         </div>
@@ -24,7 +33,7 @@
 
 
         <div id="botaoFim" class="botaoFinal">
-            <button onclick="" class="btn btn-success">
+            <button onclick="collectFormData()" class="btn btn-success">
                 <i data-lucide="save"></i>
                 Salvar e Exportar
             </button>
