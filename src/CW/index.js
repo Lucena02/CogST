@@ -442,6 +442,43 @@ function createNewSheet(sheetId, sheetName) {
     });
 }
 
+function checkExist(nomeDaSheet, spreadsheetId) {
+    return new Promise((resolve, reject) => {
+        gapi.client.sheets.spreadsheets.get({
+            spreadsheetId: spreadsheetId
+        }).then(response => {
+            const sheets = response.result.sheets;
+            const targetSheet = sheets.find(sheet => sheet.properties.title === nomeDaSheet);
+
+            if (targetSheet) {
+                alert("VOU ELIMINAR A SHEET");
+                gapi.client.sheets.spreadsheets.batchUpdate({
+                    spreadsheetId: spreadsheetId,
+                    resource: {
+                        requests: [
+                            {
+                                deleteSheet: {
+                                    sheetId: targetSheet.properties.sheetId
+                                }
+                            }
+                        ]
+                    }
+                }).then(() => {
+                    alert("Sheet deleted!");
+                    resolve(1);
+                }).catch(err => {
+                    reject(err);
+                });
+            } else {
+                resolve(0);
+            }
+        }).catch(err => {
+            reject(err);
+        });
+    });
+}
+
+
 
 function fillSheet(data, spreadsheetId) {
     const tamanho = Object.keys(data).length
@@ -490,11 +527,15 @@ function fillSheet(data, spreadsheetId) {
         valueInputOption: valueInputOption,
         resource: body,
     }).then((response) => {
-
         // Now, update background color, text formatting, and column width
         applyFormatting(spreadsheetId, sheetName);
         applyConditionalFormatting(spreadsheetId, sheetName)
-        fillRelatorio(spreadsheetId)
+        // Verificar se o relatorio existe
+        checkExist("Relatorio", spreadsheetId).then((response) => {
+            alert(response)
+            fillRelatorio(spreadsheetId)
+        })
+
     }).catch(error => {
         alert("Erro ao preencher a planilha:" + error.message);
     });
@@ -559,8 +600,6 @@ function cellToSeveridade(cell) {
     const regex = /\(Severidade: ([\w\s]+)\)/;
     const match = cell.match(regex);
     if (match && match[1]) {
-        alert(match[1])
-
         switch (match[1]) {
             case "Muito Pequena":
                 return 1
@@ -573,6 +612,19 @@ function cellToSeveridade(cell) {
             case "Muito Grave":
                 return 5
         }
+    }
+    else {
+        return 0
+    }
+}
+
+function getComentario(cell) {
+    alert(cell)
+    const regex = /Comentários: (.*)/;
+    const match = cell.match(regex);
+    if (match && match[1]) {
+        alert(match[1])
+        return match[1]
     }
     else {
         return 0
@@ -602,6 +654,7 @@ async function fillRelatorio(sheetID) {
 
     let informacoes = {}
     let severidade = {}
+    let comentarios = {}
     const numeroEvals = Object.keys(allSheetData).length - 1 // Obter o total de páginas para fazer a média
     Object.keys(allSheetData).forEach(key => {
         const sheet = allSheetData[key]
@@ -612,19 +665,24 @@ async function fillRelatorio(sheetID) {
                 if (!(nomePasso in informacoes)) {
                     informacoes[nomePasso] = [0, 0, 0, 0];
                     severidade[nomePasso] = [0, 0, 0, 0];
+                    comentarios[nomePasso] = ["", "", "", ""];
                 }
                 for (let j = 1; j < 5; j++) {
                     if (sheet[i][j].startsWith("Não")) {
                         informacoes[sheet[i][0]][j - 1] += 1
                         severidade[sheet[i][0]][j - 1] += cellToSeveridade(sheet[i][j])
                     }
-
+                    comentarios[sheet[i][0]][j - 1] += getComentario(sheet[i][j])
                 }
             }
         }
     })
+
     alert("INFO: " + JSON.stringify(informacoes))
     alert("Severidade: " + JSON.stringify(severidade))
+    alert("Comentarios: " + JSON.stringify(comentarios))
+
+    // Calcular severidade média
     Object.keys(severidade).forEach(key => {
         for (let i = 0; i < 4; i++) {
             severidade[key][i] = (severidade[key][i]) / numeroEvals
@@ -632,11 +690,32 @@ async function fillRelatorio(sheetID) {
     })
     alert("Severidade Média: " + JSON.stringify(severidade))
 
-    createNewSheet(sheetID, "Relatorio").then(() => {
-        fillRelatorioAux(informacoes, severidade, sheetID)
-    }).catch(error => {
-        alert("Erro a criar a Spreadsheet dos relatórios: " + error.message)
-    })
+    //Resumir os comentarios todos
+    fetch("http://localhost:11434/api/generate", {
+        method: "POST",
+        headers: {
+            "Content-Type": "application/json"
+        },
+        body: JSON.stringify({
+            model: "gemma3",
+            prompt: "Vou te mandar um dicionario. Por favor devolve me o dicionario com as mesmas chaves, os mesmos passos, e o mesmo numero de strings dentro de cada passo. Só quero que pegues em cada string dentro de cada passo e a resumas a uma ou duas linhas. Se não conseguires resumir, deixa estar a string original. Se conseguires deduzir o problema de um passo com base nos comentários podes adicionar no fim das strings desse passo (no index 4). Não te esqueças, uma string de input dá uma string de output. Manda-me só o dicionário, não quero outro texto. Aqui está: " + JSON.stringify(comentarios),
+            stream: false
+        })
+    }).then(response => response.json())
+        .then(data => {
+            alert(data.response);
+
+            createNewSheet(sheetID, "Relatorio").then(() => {
+                fillRelatorioAux(informacoes, severidade, sheetID)
+
+            }).catch(error => {
+                alert("Erro a criar a Spreadsheet dos relatórios: " + error.message)
+            })
+        })
+        .catch(error => {
+            alert("Ollama não está a funcionar.");
+            console.error(error);
+        });
 }
 
 
