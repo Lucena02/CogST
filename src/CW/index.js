@@ -341,8 +341,8 @@ function collectFormData() {
 
         return { problema, severidade, comentarios };
     }
-    alert(document.getElementById("tarefaSpot").value,)
-    alert(window.parent.googleFormsVar)
+    //alert(document.getElementById("tarefaSpot").value,)
+    //alert(window.parent.googleFormsVar)
     // Collect data from each iframe dynamically
     const data = {
         inicio: {
@@ -365,7 +365,7 @@ function collectFormData() {
             data[`passo${group}`] = groupData;
         }
     });
-    alert(JSON.stringify(data, null, 2));
+    // alert(JSON.stringify(data, null, 2));
     writeStats(data, data.inicio.googleLink);
 }
 
@@ -451,7 +451,7 @@ function checkExist(nomeDaSheet, spreadsheetId) {
             const targetSheet = sheets.find(sheet => sheet.properties.title === nomeDaSheet);
 
             if (targetSheet) {
-                alert("VOU ELIMINAR A SHEET");
+                // alert("VOU ELIMINAR A SHEET");
                 gapi.client.sheets.spreadsheets.batchUpdate({
                     spreadsheetId: spreadsheetId,
                     resource: {
@@ -464,7 +464,7 @@ function checkExist(nomeDaSheet, spreadsheetId) {
                         ]
                     }
                 }).then(() => {
-                    alert("Sheet deleted!");
+                    // alert("Sheet deleted!");
                     resolve(1);
                 }).catch(err => {
                     reject(err);
@@ -532,7 +532,7 @@ function fillSheet(data, spreadsheetId) {
         applyConditionalFormatting(spreadsheetId, sheetName)
         // Verificar se o relatorio existe
         checkExist("Relatorio", spreadsheetId).then((response) => {
-            alert(response)
+            // alert(response)
             fillRelatorio(spreadsheetId)
         })
 
@@ -619,11 +619,9 @@ function cellToSeveridade(cell) {
 }
 
 function getComentario(cell) {
-    alert(cell)
     const regex = /Comentários: (.*)/;
     const match = cell.match(regex);
     if (match && match[1]) {
-        alert(match[1])
         return match[1]
     }
     else {
@@ -698,15 +696,18 @@ async function fillRelatorio(sheetID) {
         },
         body: JSON.stringify({
             model: "gemma3",
-            prompt: "Vou te mandar um dicionario. Por favor devolve me o dicionario com as mesmas chaves, os mesmos passos, e o mesmo numero de strings dentro de cada passo. Só quero que pegues em cada string dentro de cada passo e a resumas a uma ou duas linhas. Se não conseguires resumir, deixa estar a string original. Se conseguires deduzir o problema de um passo com base nos comentários podes adicionar no fim das strings desse passo (no index 4). Não te esqueças, uma string de input dá uma string de output. Manda-me só o dicionário, não quero outro texto. Aqui está: " + JSON.stringify(comentarios),
+            prompt: "Vou te mandar um dicionario. Por favor devolve me o dicionario com as mesmas chaves, os mesmos passos, e o mesmo numero de strings dentro de cada passo. Só quero que pegues em cada string dentro de cada passo e a resumas em poucas palavras. Se for texto que nao faz sentido, coloca um '-'. Se conseguires deduzir o problema de um passo com base nos comentários podes adicionar no fim das strings desse passo. Não te esqueças, uma string de input dá uma string de output. Manda-me só o dicionário, não quero outro texto. Aqui está: " + JSON.stringify(comentarios),
             stream: false
         })
     }).then(response => response.json())
         .then(data => {
             alert(data.response);
-
+            rawResponse = data.response.trim().replace(/^```json\n?/, "").replace(/```$/, "").trim();
+            alert(rawResponse)
+            comentarios = JSON.parse(rawResponse);
+            alert(JSON.stringify(comentarios))
             createNewSheet(sheetID, "Relatorio").then(() => {
-                fillRelatorioAux(informacoes, severidade, sheetID)
+                fillRelatorioAux(informacoes, severidade, comentarios, sheetID)
 
             }).catch(error => {
                 alert("Erro a criar a Spreadsheet dos relatórios: " + error.message)
@@ -719,7 +720,7 @@ async function fillRelatorio(sheetID) {
 }
 
 
-function fillRelatorioAux(data, severidade, spreadsheetId) {
+function fillRelatorioAux(data, severidade, comentarios, spreadsheetId) {
     const tamanho = (Object.keys(data).length) + 1
     const range = `Relatorio!A1:E${tamanho}`;
     const valueInputOption = "RAW";
@@ -736,7 +737,7 @@ function fillRelatorioAux(data, severidade, spreadsheetId) {
 
     Object.keys(data).forEach(key => {
         for (let i = 0; i < 4; i++) {
-            data[key][i] = (data[key][i]).toString() + " (Severidade Média - " + (severidade[key][i]).toString() + ")"
+            data[key][i] = (data[key][i]).toString() + " (Severidade Média - " + (severidade[key][i]).toString() + ")\n" + comentarios[key][i].toString()
         }
         data[key].unshift(key)
         values.push(data[key])
