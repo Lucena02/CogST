@@ -307,6 +307,9 @@ function backWalkthrough(indexPasso) {
 
 
 function collectFormData() {
+    document.getElementById("loading").style.display = "flex"
+    document.getElementById("passos").style.display = "none"
+    document.getElementById("textoLoading").innerHTML = "A recolher informação do forms..."
     // Get all iframes that match the pattern "iframeN1", "iframeN2", etc.
     const iframeGroups = {};
     document.querySelectorAll("iframe[id^='iframe']").forEach(iframe => {
@@ -371,7 +374,7 @@ function collectFormData() {
 
 
 function writeStats(data, url) {
-
+    document.getElementById("textoLoading").innerHTML = "A autenticar na google API..."
     const regex = /\/\w+\//g;
     const matches = url.match(regex);
     const sheet_id = matches[1].slice(1, -1);
@@ -379,6 +382,7 @@ function writeStats(data, url) {
     const token = localStorage.getItem("access_token");
     const username = localStorage.getItem('nome_user')
     loadGapiWithAuth(token).then(() => {
+        document.getElementById("textoLoading").innerHTML = "A criar a folha no google sheets..."
         createNewSheet(sheet_id, username).then(() => {
             fillSheet(data, sheet_id)
         }).catch(error => {
@@ -403,7 +407,7 @@ function loadGapiWithAuth(accessToken) {
 
                 return gapi.client.load("sheets", "v4");
             }).then(() => {
-                alert("GAPI Loaded, Authenticated & Sheets API Ready!");
+                //alert("GAPI Loaded, Authenticated & Sheets API Ready!");
                 resolve(); // 👈 GAPI e Sheets prontos
             }).catch(error => {
                 alert("Erro ao inicializar GAPI: " + error.message);
@@ -530,6 +534,7 @@ function fillSheet(data, spreadsheetId) {
         // Now, update background color, text formatting, and column width
         applyFormatting(spreadsheetId, sheetName);
         applyConditionalFormatting(spreadsheetId, sheetName)
+        document.getElementById("textoLoading").innerHTML = "A preencher o relatório final..."
         // Verificar se o relatorio existe
         checkExist("Relatorio", spreadsheetId).then((response) => {
             // alert(response)
@@ -676,9 +681,9 @@ async function fillRelatorio(sheetID) {
         }
     })
 
-    alert("INFO: " + JSON.stringify(informacoes))
-    alert("Severidade: " + JSON.stringify(severidade))
-    alert("Comentarios: " + JSON.stringify(comentarios))
+    //alert("INFO: " + JSON.stringify(informacoes))
+    //alert("Severidade: " + JSON.stringify(severidade))
+    //alert("Comentarios: " + JSON.stringify(comentarios))
 
     // Calcular severidade média
     Object.keys(severidade).forEach(key => {
@@ -686,8 +691,8 @@ async function fillRelatorio(sheetID) {
             severidade[key][i] = (severidade[key][i]) / numeroEvals
         }
     })
-    alert("Severidade Média: " + JSON.stringify(severidade))
-
+    //alert("Severidade Média: " + JSON.stringify(severidade))
+    document.getElementById("textoLoading").innerHTML = "A resumir comentários..."
     //Resumir os comentarios todos
     fetch("http://localhost:11434/api/generate", {
         method: "POST",
@@ -701,11 +706,8 @@ async function fillRelatorio(sheetID) {
         })
     }).then(response => response.json())
         .then(data => {
-            alert(data.response);
             rawResponse = data.response.trim().replace(/^```json\n?/, "").replace(/```$/, "").trim();
-            alert(rawResponse)
             comentarios = JSON.parse(rawResponse);
-            alert(JSON.stringify(comentarios))
             createNewSheet(sheetID, "Relatorio").then(() => {
                 fillRelatorioAux(informacoes, severidade, comentarios, sheetID)
 
@@ -743,7 +745,7 @@ function fillRelatorioAux(data, severidade, comentarios, spreadsheetId) {
         values.push(data[key])
     })
 
-    alert(JSON.stringify(values, null, 2))
+    //alert(JSON.stringify(values, null, 2))
     const body = { values: values };
 
     // First, update cell values
@@ -753,7 +755,11 @@ function fillRelatorioAux(data, severidade, comentarios, spreadsheetId) {
         valueInputOption: valueInputOption,
         resource: body,
     }).then((response) => {
+
         applyFormatting(spreadsheetId, "Relatorio");
+        document.getElementById("spinner").style.display = "none"
+        document.getElementById("textoLoading").innerHTML = "CW executado com sucesso!"
+        document.getElementById("loadingDone").style.display = "flex"
     }).catch(error => {
         alert("Erro ao preencher o relatorio:" + error.message);
     });
@@ -839,7 +845,7 @@ async function retrocedeCW2() {
 
     const result = await window.electronAPI.showConfirmationDialog({
         title: "Confirmar Retrocesso",
-        message: "Tem a certeza que quer retroceder? Todo o progresso será perdido.",
+        message: "Tem a certeza que quer retroceder? Todo o progresso será perdido. (A não ser que tenha finalizado o CW)",
         buttons: ["Cancelar", "Sim"]
     });
 

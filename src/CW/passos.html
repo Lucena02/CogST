@@ -11,9 +11,13 @@
 </head>
 
 <body class="passos2">
-    <div>
 
+    <div class="containerLoading" id="loading">
+        <i data-lucide="check" id="loadingDone" class="iconCheck"></i>
+        <div class="spinner" id="spinner"></div>
+        <div id="textoLoading"></div>
     </div>
+
     <div class="containerPassos" id="passos">
         <div class="topotopo">
 
@@ -32,7 +36,7 @@
 
 
 
-        <div id="botaoFim" class="botaoFinal">
+        <div id="botaoFim">
             <button onclick="collectFormData()" class="btn btn-success">
                 <i data-lucide="save"></i>
                 Salvar e Exportar
