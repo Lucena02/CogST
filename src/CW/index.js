@@ -743,7 +743,9 @@ Aqui está o dicionário:\n${JSON.stringify(comentarios)}`,
         })
         .catch(error => {
             alert("Ollama não está a funcionar.");
-            console.error(error);
+            createNewSheet(sheetID, "Relatorio").then(() => {
+                fillRelatorioAux(informacoes, severidade, null, sheetID)
+            })
         });
 }
 
