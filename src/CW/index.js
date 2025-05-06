@@ -376,7 +376,7 @@ function collectFormData() {
 
 function writeStats(data, url) {
     document.getElementById("textoLoading").innerHTML = "A autenticar na google API..."
-    const regex = /\/\w+\//g;
+    const regex = /\/[\w|\-]+\//g;
     const matches = url.match(regex);
     const sheet_id = matches[1].slice(1, -1);
 
