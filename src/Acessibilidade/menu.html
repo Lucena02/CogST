@@ -47,21 +47,9 @@
                         </div>
                     </form>
 
-                    <div class="navigation-buttons">
-                        <button onclick="retrocederCW()" class="btn btn-secondary">
-                            <i data-lucide="arrow-left"></i>
-                            Retroceder
-                        </button>
 
-                        <button onclick="toPassos()" class="btn btn-primary">
-                            Definir passos
-                            <i data-lucide="arrow-right"></i>
-                        </button>
-                    </div>
                 </div>
             </div>
-
-            <iframe src="definirPassos.html" class="passos" frameborder="0" id="passosFrame"></iframe>
 
             <div id="botoesTesteRetroceder" class="back-buttons">
                 <button onclick="retrocedePassos()" class="btn btn-secondary">
@@ -89,23 +77,19 @@
         const toggleIcon = document.getElementById('toggleIcon');
         const contentContainer = document.getElementById('contentA');
 
-
         function resizeWindow() {
             isExpanded = !isExpanded;
 
             if (isExpanded) {
-
                 sidebarTab.style.width = 'var(--tab-width)';
-                toggleIcon.setAttribute('data-lucide', 'chevron-right');
                 contentContainer.style.opacity = '1';
                 contentContainer.style.width = '90%';
-                window.electronAPI.updateWindowSize(330);
+                toggleIcon.setAttribute('name', 'chevron-right');
             } else {
                 sidebarTab.style.width = 'var(--collapsed-width)';
                 contentContainer.style.opacity = '0';
                 contentContainer.style.width = '0';
-                toggleIcon.setAttribute('data-lucide', 'chevron-left');
-                window.electronAPI.updateWindowSize(40);
+                toggleIcon.setAttribute('name', 'chevron-left');
             }
         }
 

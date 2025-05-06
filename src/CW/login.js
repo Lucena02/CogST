@@ -14,22 +14,18 @@ window.addEventListener("DOMContentLoaded", () => {
         if (isExpanded) {
 
             sidebarTab.style.width = 'var(--tab-width)';
+            toggleIcon.setAttribute('data-lucide', 'chevron-right');
             contentContainer.style.opacity = '1';
             contentContainer.style.width = '90%';
-            toggleIcon.setAttribute('name', 'chevron-right');
-            //window.electronAPI.updateWindowSize(330);
+            window.electronAPI.updateWindowSize(330);
         } else {
             sidebarTab.style.width = 'var(--collapsed-width)';
             contentContainer.style.opacity = '0';
             contentContainer.style.width = '0';
-            toggleIcon.setAttribute('name', 'chevron-left');
-            //setTimeout(() => {
-            //    window.electronAPI.updateWindowSize(40);
-            //}, 500);
+            toggleIcon.setAttribute('data-lucide', 'chevron-left');
+            window.electronAPI.updateWindowSize(40);
         }
-
     }
-
     toggleButton.addEventListener('click', resizeWindow);
 });
 /*

@@ -55,6 +55,7 @@ body {
     border-radius: 12px 0 0 12px;
     border: 1px solid var(--border-color);
     box-shadow: -2px 0 10px rgba(0, 0, 0, 0.1);
+    transition: width var(--transition-speed) ease-in-out;
     overflow: hidden;
 }
 
@@ -72,6 +73,7 @@ body {
     border: none;
     border-radius: 10px 0 0 10px;
     cursor: pointer;
+    transition: background-color var(--transition-speed);
     flex-shrink: 0;
 }
 
