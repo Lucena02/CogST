@@ -123,6 +123,13 @@ async function retrocederCW() {
     }
 }
 
+
+function fechar() {
+    window.electronAPI.send("fechaTudo")
+}
+
+
+
 function exportPassos() {
     const passosData = {};
     const iframe = document.getElementById("passosFrame");

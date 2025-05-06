@@ -143,6 +143,8 @@ body {
     margin-bottom: 16px;
 }
 
+
+
 .action-button {
     display: flex;
     align-items: center;
@@ -160,6 +162,8 @@ body {
     text-align: left;
 }
 
+
+
 .action-button:hover {
     background-color: #f8fafc;
     border-color: #94a3b8;
@@ -168,6 +172,15 @@ body {
 .action-button svg {
     width: 16px;
     height: 16px;
+}
+
+.exit-button {
+    background-color: #ffd8d8;
+}
+
+.exit-button:hover {
+    background-color: #fdc9c9;
+    border-color: #94a3b8;
 }
 
 .error {

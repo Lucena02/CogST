@@ -33,7 +33,16 @@ app.whenReady().then(() => {
 });
 
 
-//app.whenReady().then();
+// Se nao ha nenhuma janela, fecha javascript
+app.on("window-all-closed", function () {
+    if (process.platform !== "darwin") {
+        app.quit();
+    }
+});
+
+ipcMain.on("fechaTudo", (event) => {
+    win.close();
+});
 
 ipcMain.on("login", (event) => {
     authenticateUser();

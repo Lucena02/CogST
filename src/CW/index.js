@@ -256,6 +256,7 @@ function executeWalkthrough(indexPasso, flag) {
         botoes.style.display = "none"
         avançar.innerHTML = "Avançar"
         botoesIndex.style.display = "none"
+        document.getElementById("passoDesc" + indexPasso).style.textDecoration = "line-through";
         state = 0
     }
 
@@ -383,12 +384,16 @@ function writeStats(data, url) {
     const username = localStorage.getItem('nome_user')
     loadGapiWithAuth(token).then(() => {
         document.getElementById("textoLoading").innerHTML = "A criar a folha no google sheets..."
-        createNewSheet(sheet_id, username).then(() => {
-            fillSheet(data, sheet_id)
+        checkExist(username, sheet_id).then(() => {
+            createNewSheet(sheet_id, username).then(() => {
+                fillSheet(data, sheet_id)
+            }).catch(error => {
+                alert("Error creating sheet:" + error.message);
+            });
         }).catch(error => {
-            alert("Error creating sheet:" + error.message);
+            alert("Erro a verificar se uma spread existe")
         });
-    })
+    });
 }
 
 // GAPI
@@ -630,7 +635,7 @@ function getComentario(cell) {
         return match[1]
     }
     else {
-        return 0
+        return ""
     }
 }
 
@@ -675,7 +680,12 @@ async function fillRelatorio(sheetID) {
                         informacoes[sheet[i][0]][j - 1] += 1
                         severidade[sheet[i][0]][j - 1] += cellToSeveridade(sheet[i][j])
                     }
-                    comentarios[sheet[i][0]][j - 1] += getComentario(sheet[i][j])
+
+                    let coms = getComentario(sheet[i][j])
+                    if (coms != "") {
+                        comentarios[sheet[i][0]][j - 1] += coms + ". "
+                    }
+
                 }
             }
         }
@@ -684,7 +694,6 @@ async function fillRelatorio(sheetID) {
     //alert("INFO: " + JSON.stringify(informacoes))
     //alert("Severidade: " + JSON.stringify(severidade))
     //alert("Comentarios: " + JSON.stringify(comentarios))
-
     // Calcular severidade média
     Object.keys(severidade).forEach(key => {
         for (let i = 0; i < 4; i++) {
@@ -700,14 +709,31 @@ async function fillRelatorio(sheetID) {
             "Content-Type": "application/json"
         },
         body: JSON.stringify({
-            model: "gemma3",
-            prompt: "Vou te mandar um dicionario. Por favor devolve me o dicionario com as mesmas chaves, os mesmos passos, e o mesmo numero de strings dentro de cada passo. Só quero que pegues em cada string dentro de cada passo e a resumas em poucas palavras. Se for texto que nao faz sentido, coloca um '-'. Se conseguires deduzir o problema de um passo com base nos comentários podes adicionar no fim das strings desse passo. Não te esqueças, uma string de input dá uma string de output. Manda-me só o dicionário, não quero outro texto. Aqui está: " + JSON.stringify(comentarios),
+            model: "llama3:8b",
+            prompt: `Recebes um dicionário onde cada chave é um passo e o valor é uma lista de 4 comentários.
+
+Tarefa:
+1. Resume cada comentário em até 6 palavras.
+2. Se um comentário for irrelevante ou incompreensível, escreve apenas '-'.
+3. Devolve apenas o dicionário final, como JSON. Sem texto extra antes nem depois.
+4. Cada chave deve ter sempre a mesma estrutura de 4 comentarios, mesmo que sejam strings vazias.
+É MUITO IMPORTANTE QUE DEVOLVAS APENAS O DICIONARIO SEM TEXTO ANTES NEM DEPOIS.
+
+Aqui está o dicionário:\n${JSON.stringify(comentarios)}`,
             stream: false
         })
     }).then(response => response.json())
         .then(data => {
-            rawResponse = data.response.trim().replace(/^```json\n?/, "").replace(/```$/, "").trim();
-            comentarios = JSON.parse(rawResponse);
+            //alert(JSON.stringify(data))
+            //alert(JSON.stringify(data.response))
+            let comentarios = null;
+            try {
+                rawResponse = data.response.trim().replace(/^```json\n?/, "").replace(/```$/, "").trim();
+                comentarios = JSON.parse(rawResponse);
+            } catch (error) {
+                alert("Erro a processar os comentários, vai usar null.");
+            }
+            //alert("Comentarios: " + JSON.stringify(comentarios))
             createNewSheet(sheetID, "Relatorio").then(() => {
                 fillRelatorioAux(informacoes, severidade, comentarios, sheetID)
 
@@ -739,7 +765,11 @@ function fillRelatorioAux(data, severidade, comentarios, spreadsheetId) {
 
     Object.keys(data).forEach(key => {
         for (let i = 0; i < 4; i++) {
-            data[key][i] = (data[key][i]).toString() + " (Severidade Média - " + (severidade[key][i]).toString() + ")\n" + comentarios[key][i].toString()
+            let string = "Problemas: " + (data[key][i]).toString() + " (Severidade Média - " + (severidade[key][i]).toString() + ")\n"
+            if (comentarios != null && comentarios[key][i] != undefined) {
+                string += comentarios[key][i].toString()
+            }
+            data[key][i] = string
         }
         data[key].unshift(key)
         values.push(data[key])
