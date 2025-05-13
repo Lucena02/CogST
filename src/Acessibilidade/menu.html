@@ -5,7 +5,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>CogST - Definir CW</title>
-    <link rel="stylesheet" href="definirCW.css">
+    <link rel="stylesheet" href="menu.css">
     <script src="https://apis.google.com/js/api.js"></script>
     <!-- Add Lucide Icons -->
     <script src="https://unpkg.com/lucide@latest"></script>
@@ -28,22 +28,12 @@
                 </div>
 
                 <div class="form-section">
-                    <h3 class="section-title">Definir CW</h3>
+                    <h3 class="section-title">Medir Acessibilidade</h3>
 
                     <form id="form-inicio" class="cw-form">
                         <div class="form-group">
-                            <label for="tarefa">Tarefa a realizar</label>
-                            <textarea id="tarefa" rows="3"></textarea>
-                        </div>
-
-                        <div class="form-group">
-                            <label for="google-link">Google Sheets Link</label>
-                            <textarea id="google-link" rows="1"></textarea>
-                        </div>
-
-                        <div class="form-group">
-                            <label for="persona">Definir Persona</label>
-                            <textarea id="persona" rows="1"></textarea>
+                            <label for="site-analise">Site a analisar</label>
+                            <textarea id="site-analise" rows="1"></textarea>
                         </div>
                     </form>
 
@@ -51,17 +41,10 @@
                 </div>
             </div>
 
-            <div id="botoesTesteRetroceder" class="back-buttons">
-                <button onclick="retrocedePassos()" class="btn btn-secondary">
-                    <i data-lucide="arrow-left"></i>
-                    Definir CW
-                </button>
-            </div>
-
             <div id="botaoFim" class="export-button">
-                <button onclick="exportPassos()" class="btn btn-success">
-                    <i data-lucide="save"></i>
-                    Salvar e Exportar
+                <button onclick="runTestsAcessibility()" class="btn btn-success">
+                    <i data-lucide="search-code"></i>
+                    Salvar e Analisar
                 </button>
             </div>
         </div>

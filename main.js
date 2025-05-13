@@ -54,6 +54,13 @@ ipcMain.on("start-main-app", () => {
     }
 });
 
+
+ipcMain.on("acessibilidade-main-app", () => {
+    if (win) {
+        win.loadFile("src/Acessibilidade/menu.html");
+    }
+});
+
 ipcMain.on("definir-CW", () => {
     if (win) {
         win.loadFile("src/CW/definirCW.html");
