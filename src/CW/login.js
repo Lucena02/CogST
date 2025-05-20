@@ -1,33 +1,30 @@
 
-window.addEventListener("DOMContentLoaded", () => {
-    lucide.createIcons();
+lucide.createIcons();
+function resizeWindow() {
 
-    let isExpanded = true;
     const toggleButton = document.getElementById('toggleButton');
     const sidebarTab = document.getElementById('sidebarTab');
     const toggleIcon = document.getElementById('toggleIcon');
     const contentContainer = document.getElementById('contentContainer');
 
-    function resizeWindow() {
-        isExpanded = !isExpanded;
+    if (isExpanded == false) {
 
-        if (isExpanded) {
-
-            sidebarTab.style.width = 'var(--tab-width)';
-            toggleIcon.setAttribute('data-lucide', 'chevron-right');
-            contentContainer.style.opacity = '1';
-            contentContainer.style.width = '90%';
-            window.electronAPI.updateWindowSize(330);
-        } else {
-            sidebarTab.style.width = 'var(--collapsed-width)';
-            contentContainer.style.opacity = '0';
-            contentContainer.style.width = '0';
-            toggleIcon.setAttribute('data-lucide', 'chevron-left');
-            window.electronAPI.updateWindowSize(40);
-        }
+        sidebarTab.style.width = 'var(--tab-width)';
+        toggleIcon.setAttribute('data-lucide', 'chevron-right');
+        contentContainer.style.opacity = '1';
+        contentContainer.style.width = '90%';
+        window.electronAPI.updateWindowSize(330);
+        isExpanded = true
+    } else {
+        sidebarTab.style.width = 'var(--collapsed-width)';
+        contentContainer.style.opacity = '0';
+        contentContainer.style.width = '0';
+        toggleIcon.setAttribute('data-lucide', 'chevron-left');
+        window.electronAPI.updateWindowSize(40);
+        isExpanded = false
     }
-    toggleButton.addEventListener('click', resizeWindow);
-});
+}
+let isExpanded = true;
 /*
 function resizeWindow() {
     const content = document.getElementById("contentA");
@@ -105,6 +102,10 @@ function preencherCW() {
         window.electronAPI.send("preencher-CW")
     }
 
+}
+
+function gerarRelatorio() {
+    window.electronAPI.send("definir-relatorio")
 }
 
 async function retrocederCW() {

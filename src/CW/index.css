@@ -82,6 +82,8 @@ body {
     align-items: center;
     width: 90%;
     overflow: hidden;
+    width: calc(100% - var(--collapsed-width));
+    transition: opacity var(--transition-speed);
 }
 
 .content {

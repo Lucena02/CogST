@@ -13,7 +13,7 @@
 
 <body>
     <div class="tab" id="sidebarTab">
-        <button class="leftArrow" id="toggleButton">
+        <button onclick="resizeWindow()" class="leftArrow" id="toggleButton">
             <i id="toggleIcon" data-lucide="chevron-right"></i>
         </button>
         <div class="container" id="contentContainer">
@@ -38,10 +38,16 @@
                         <span>Preencher CW</span>
                     </button>
 
+                    <button onclick="gerarRelatorio()" class="action-button">
+                        <i data-lucide="file-text"></i>
+                        <span>Criar Relatório</span>
+                    </button>
+
                     <button onclick="login()" class="action-button">
                         <i data-lucide="log-in"></i>
                         <span id="login">Login</span>
                     </button>
+
                     <button onclick="fechar()" class="action-button exit-button">
                         <i data-lucide="door-open"></i>
                         <span id="login">Fechar</span>

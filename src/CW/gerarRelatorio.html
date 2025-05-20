@@ -18,6 +18,11 @@
             <i data-lucide="chevron-right" id="toggleIcon"></i>
         </button>
         <div class="container2" id="contentContainer">
+            <div class="containerLoading" id="loading">
+                <i data-lucide="check" id="loadingDone" class="iconCheck"></i>
+                <div class="spinner" id="spinner"></div>
+                <div id="textoLoading"></div>
+            </div>
             <div class="content" id="contentFrame">
                 <div class="header">
                     <div class="cogst">
@@ -27,6 +32,7 @@
                         <i data-lucide="help-circle"></i>
                     </a>
                 </div>
+                <h3>Criar Relatório</h3>
 
                 <div class="file-input-container">
                     <div class="file-input-wrapper">
@@ -37,7 +43,7 @@
 
                 <!-- Import button -->
                 <div id="botoesImportar" class="botoesImportar">
-                    <button onclick="importPassos()" id="importButton">Importar e Começar</button>
+                    <button onclick="importRelatorio()" id="importButton">Criar Relatório</button>
                 </div>
 
                 <!-- Error message -->
@@ -46,7 +52,7 @@
                 </div>
 
             </div>
-            <iframe src="passos.html" class="passos" frameborder="0" id="passosFrame"></iframe>
+
             <div id="recuar" class="back-buttons">
                 <button onclick="retrocedeCW2()" class="btn btn-secondary">
                     <i data-lucide="arrow-left"></i>
@@ -61,6 +67,7 @@
 
     <script src="index.js"></script>
     <script src="passos.js"></script>
+
 </body>
 
 </html>

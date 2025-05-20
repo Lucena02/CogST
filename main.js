@@ -67,6 +67,12 @@ ipcMain.on("definir-CW", () => {
     }
 });
 
+ipcMain.on("definir-relatorio", () => {
+    if (win) {
+        win.loadFile("src/CW/gerarRelatorio.html");
+    }
+});
+
 ipcMain.on("preencher-CW", () => {
     if (win) {
         win.loadFile("src/CW/preencherCW.html");

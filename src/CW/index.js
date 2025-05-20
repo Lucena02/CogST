@@ -1,6 +1,32 @@
 
 // Set global CSS variables dynamically
 
+lucide.createIcons();
+function resizeWindow() {
+
+    const toggleButton = document.getElementById('toggleButton');
+    const sidebarTab = document.getElementById('sidebarTab');
+    const toggleIcon = document.getElementById('toggleIcon');
+    const contentContainer = document.getElementById('contentContainer');
+
+    if (isExpanded == false) {
+
+        sidebarTab.style.width = 'var(--tab-width)';
+        toggleIcon.setAttribute('data-lucide', 'chevron-right');
+        contentContainer.style.opacity = '1';
+        contentContainer.style.width = '90%';
+        window.electronAPI.updateWindowSize(330);
+        isExpanded = true
+    } else {
+        sidebarTab.style.width = 'var(--collapsed-width)';
+        contentContainer.style.opacity = '0';
+        contentContainer.style.width = '0';
+        toggleIcon.setAttribute('data-lucide', 'chevron-left');
+        window.electronAPI.updateWindowSize(40);
+        isExpanded = false
+    }
+}
+let isExpanded = true;
 let flag = 0;
 let passoIndex = 1;
 
@@ -539,12 +565,16 @@ function fillSheet(data, spreadsheetId) {
         // Now, update background color, text formatting, and column width
         applyFormatting(spreadsheetId, sheetName);
         applyConditionalFormatting(spreadsheetId, sheetName)
-        document.getElementById("textoLoading").innerHTML = "A preencher o relatório final..."
+
+        document.getElementById("spinner").style.display = "none"
+        document.getElementById("textoLoading").innerHTML = "CW executado com sucesso!"
+        document.getElementById("loadingDone").style.display = "flex"
+
         // Verificar se o relatorio existe
-        checkExist("Relatorio", spreadsheetId).then((response) => {
-            // alert(response)
-            fillRelatorio(spreadsheetId)
-        })
+        // checkExist("Relatorio", spreadsheetId).then((response) => {
+        //     // alert(response)
+        //     fillRelatorio(spreadsheetId)
+        // })
 
     }).catch(error => {
         alert("Erro ao preencher a planilha:" + error.message);
@@ -790,7 +820,7 @@ function fillRelatorioAux(data, severidade, comentarios, spreadsheetId) {
 
         applyFormatting(spreadsheetId, "Relatorio");
         document.getElementById("spinner").style.display = "none"
-        document.getElementById("textoLoading").innerHTML = "CW executado com sucesso!"
+        document.getElementById("textoLoading").innerHTML = "Relatório criado com sucesso!"
         document.getElementById("loadingDone").style.display = "flex"
     }).catch(error => {
         alert("Erro ao preencher o relatorio:" + error.message);
@@ -886,3 +916,37 @@ async function retrocedeCW2() {
     }
 }
 
+function importRelatorio() {
+    const input = document.getElementById("fileInput")
+
+    if (input.files.length > 0) {
+        const file = input.files[0];
+
+        // Ler o conteúdo do ficheiro (se for necessário)
+        const reader = new FileReader();
+        reader.onload = function (event) {
+            try {
+                const jsonData = JSON.parse(event.target.result);
+
+                const regex = /\/[\w|\-]+\//g;
+                const matches = jsonData[0].googleLink.match(regex);
+                const sheet_id = matches[1].slice(1, -1);
+
+                document.getElementById("contentFrame").style.display = "none"
+                document.getElementById("loading").style.display = "flex"
+                document.getElementById("textoLoading").innerHTML = "A recolher todas as respostas..."
+                fillRelatorio(sheet_id)
+
+            } catch (e) {
+                alert("Erro ao processar o JSON: " + e.message);
+            }
+        };
+        reader.readAsText(file);
+
+
+
+
+    } else {
+        document.getElementById("error").innerHTML = "Nenhum arquivo importado";
+    }
+}
