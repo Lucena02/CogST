@@ -764,17 +764,27 @@ Aqui está o dicionário:\n${JSON.stringify(comentarios)}`,
                 alert("Erro a processar os comentários, vai usar null.");
             }
             //alert("Comentarios: " + JSON.stringify(comentarios))
-            createNewSheet(sheetID, "Relatorio").then(() => {
-                fillRelatorioAux(informacoes, severidade, comentarios, sheetID)
-
+            checkExist("Relatorio", sheetID).then(() => {
+                createNewSheet(sheetID, "Relatorio").then(() => {
+                    fillRelatorioAux(informacoes, severidade, comentarios, sheetID)
+                }).catch(error => {
+                    alert("Erro a criar a Spreadsheet dos relatórios: " + error.message)
+                })
             }).catch(error => {
                 alert("Erro a criar a Spreadsheet dos relatórios: " + error.message)
             })
+
         })
         .catch(error => {
             alert("Ollama não está a funcionar.");
-            createNewSheet(sheetID, "Relatorio").then(() => {
-                fillRelatorioAux(informacoes, severidade, null, sheetID)
+            checkExist("Relatorio", sheetID).then(() => {
+                createNewSheet(sheetID, "Relatorio").then(() => {
+                    fillRelatorioAux(informacoes, severidade, comentarios, sheetID)
+                }).catch(error => {
+                    alert("Erro a criar a Spreadsheet dos relatórios: " + error.message)
+                })
+            }).catch(error => {
+                alert("Erro a criar a Spreadsheet dos relatórios: " + error.message)
             })
         });
 }
@@ -935,7 +945,18 @@ function importRelatorio() {
                 document.getElementById("contentFrame").style.display = "none"
                 document.getElementById("loading").style.display = "flex"
                 document.getElementById("textoLoading").innerHTML = "A recolher todas as respostas..."
-                fillRelatorio(sheet_id)
+
+
+                const token = localStorage.getItem("access_token");
+                const username = localStorage.getItem('nome_user')
+                loadGapiWithAuth(token).then(() => {
+                    document.getElementById("textoLoading").innerHTML = "A autenticar o utilizador na google..."
+                    fillRelatorio(sheet_id)
+                    }).catch(error => {
+                        alert("Erro a autenticar o utilizador na google")
+                    });
+
+                
 
             } catch (e) {
                 alert("Erro ao processar o JSON: " + e.message);

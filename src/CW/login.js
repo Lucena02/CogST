@@ -125,6 +125,10 @@ function fechar() {
     window.electronAPI.send("fechaTudo")
 }
 
+function retroceder(){
+    window.electronAPI.send("go-back")
+}
+
 
 
 function exportPassos() {

@@ -3,17 +3,33 @@
 
 <head>
     <link rel="stylesheet" href="menu.css">
+    <script src="https://unpkg.com/lucide@latest"></script>
 </head>
 
 <body>
     <div class="container">
         <h1>Avaliação de<br>Usabilidade</h1>
-        <button id="startBtn">Fazer CW</button>
-        <button>Avaliar Responsividade</button>
-        <button id="acessibilidadeButton">Avaliar Acessibilidade</button>
+
+        <div class="buttons-container">
+            <button class="action-button" id="startBtn">
+                <i data-lucide="brain"></i>
+                <span>Fazer CW</span>
+            </button>
+
+            <button onclick="" class="action-button">
+                <i data-lucide="monitor-smartphone"></i>
+                <span>Avaliar Responsividade</span>
+            </button>
+
+            <button onclick="definirCW()" class="action-button" id="acessibilidadeButton">
+                <i data-lucide="accessibility"></i>
+                <span>Avaliar Acessibilidade</span>
+            </button>
+        </div>
     </div>
 
     <script>
+        lucide.createIcons();
         document.getElementById('startBtn').addEventListener('click', () => {
             window.electronAPI.send('start-main-app');
         });

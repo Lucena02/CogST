@@ -3,7 +3,7 @@ require('dotenv').config({ path: 'vars.env' });
 require('dotenv').config({ path: 'priv.env' });
 const { google } = require("googleapis");
 const express = require("express");
-
+import { runTestsAcessibility } from './pupetFunctions';
 
 let win;
 app.whenReady().then(() => {
@@ -44,6 +44,12 @@ ipcMain.on("fechaTudo", (event) => {
     win.close();
 });
 
+ipcMain.on("go-back", (event) => {
+    if (win) {
+        win.loadFile("src/menu.html");
+    }
+});
+
 ipcMain.on("login", (event) => {
     authenticateUser();
 });
@@ -79,6 +85,9 @@ ipcMain.on("preencher-CW", () => {
     }
 });
 
+ipcMain.on("medir-acesibilidade", (url) => {
+    //#TODO
+});
 
 ipcMain.on("update-window-width", (event, newWidth) => {
     const { width, height } = screen.getPrimaryDisplay().bounds;

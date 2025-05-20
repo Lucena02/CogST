@@ -16,6 +16,8 @@ body {
 }
 
 .container {
+    height:100%;
+    width: 100%;
     background: rgb(230, 230, 230);
     border-radius: 12px 0 0 12px;
     border: 1px solid #000000;
@@ -33,4 +35,34 @@ button {
     border: 1px solid #aaa;
     border-radius: 4px;
     cursor: pointer;
+}
+
+.action-button {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    width: 100%;
+    padding: 8px 12px;
+    border: 1px solid #d1d5db;
+    border-radius: 6px;
+    background-color: white;
+    color: #1f2937;
+    font-family: "Roboto", sans-serif;
+    font-size: 14px;
+    cursor: pointer;
+    transition: background-color 0.3s, border-color 0.3s;
+    text-align: left;
+}
+
+
+.action-button:hover {
+    background-color: #f8fafc;
+    border-color: #94a3b8;
+}
+
+.buttons-container {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+    margin-bottom: 16px;
 }
