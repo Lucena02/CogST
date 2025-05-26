@@ -25,6 +25,10 @@
                 <i data-lucide="accessibility"></i>
                 <span>Avaliar Acessibilidade</span>
             </button>
+            <button onclick="fechar()" class="action-button exit-button" id="closeButton">
+                <i data-lucide="door-open"></i>
+                <span id="login">Fechar</span>
+            </button>
         </div>
     </div>
 
@@ -35,6 +39,9 @@
         });
         document.getElementById('acessibilidadeButton').addEventListener('click', () => {
             window.electronAPI.send('acessibilidade-main-app');
+        });
+        document.getElementById('closeButton').addEventListener('click', () => {
+            window.electronAPI.send("fechaTudo")
         });
     </script>
 </body>

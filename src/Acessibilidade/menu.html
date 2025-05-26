@@ -35,6 +35,12 @@
                             <label for="site-analise">Site a analisar</label>
                             <textarea id="site-analise" rows="1"></textarea>
                         </div>
+                        <div style="display: flex; justify-content: center;">
+                            <button onclick="runTestsAcessibility()" class="btn btn-success">
+                                <i data-lucide="search-code"></i>
+                                Salvar e Analisar
+                            </button>
+                        </div>
                     </form>
 
 
@@ -42,9 +48,10 @@
             </div>
 
             <div id="botaoFim" class="export-button">
-                <button onclick="runTestsAcessibility()" class="btn btn-success">
-                    <i data-lucide="search-code"></i>
-                    Salvar e Analisar
+
+                <button onclick="retroceder()" class="btn btn-secondary">
+                    <i data-lucide="arrow-left"></i>
+                    Início
                 </button>
             </div>
         </div>

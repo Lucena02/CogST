@@ -16,7 +16,7 @@ body {
 }
 
 .container {
-    height:100%;
+    height: 100%;
     width: 100%;
     background: rgb(230, 230, 230);
     border-radius: 12px 0 0 12px;
@@ -65,4 +65,14 @@ button {
     flex-direction: column;
     gap: 12px;
     margin-bottom: 16px;
+}
+
+.exit-button {
+    background-color: #ffd8d8;
+}
+
+
+.exit-button:hover {
+    background-color: #fdc9c9;
+    border-color: #94a3b8;
 }
