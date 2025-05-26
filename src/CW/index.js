@@ -733,60 +733,29 @@ async function fillRelatorio(sheetID) {
     //alert("Severidade Média: " + JSON.stringify(severidade))
     document.getElementById("textoLoading").innerHTML = "A resumir comentários..."
     //Resumir os comentarios todos
-    fetch("http://localhost:11434/api/generate", {
-        method: "POST",
-        headers: {
-            "Content-Type": "application/json"
-        },
-        body: JSON.stringify({
-            model: "llama3:8b",
-            prompt: `Recebes um dicionário onde cada chave é um passo e o valor é uma lista de 4 comentários.
 
-Tarefa:
-1. Resume cada comentário em até 6 palavras.
-2. Se um comentário for irrelevante ou incompreensível, escreve apenas '-'.
-3. Devolve apenas o dicionário final, como JSON. Sem texto extra antes nem depois.
-4. Cada chave deve ter sempre a mesma estrutura de 4 comentarios, mesmo que sejam strings vazias.
-É MUITO IMPORTANTE QUE DEVOLVAS APENAS O DICIONARIO SEM TEXTO ANTES NEM DEPOIS.
+    window.electronAPI.send("resumir-comentarios", comentarios)
+    window.electronAPI.receive("resumo-pronto", (resumo) => {
+        //alert(JSON.stringify(resumo))
 
-Aqui está o dicionário:\n${JSON.stringify(comentarios)}`,
-            stream: false
-        })
-    }).then(response => response.json())
-        .then(data => {
-            //alert(JSON.stringify(data))
-            //alert(JSON.stringify(data.response))
-            let comentarios = null;
-            try {
-                rawResponse = data.response.trim().replace(/^```json\n?/, "").replace(/```$/, "").trim();
-                comentarios = JSON.parse(rawResponse);
-            } catch (error) {
-                alert("Erro a processar os comentários, vai usar null.");
-            }
-            //alert("Comentarios: " + JSON.stringify(comentarios))
-            checkExist("Relatorio", sheetID).then(() => {
-                createNewSheet(sheetID, "Relatorio").then(() => {
-                    fillRelatorioAux(informacoes, severidade, comentarios, sheetID)
-                }).catch(error => {
-                    alert("Erro a criar a Spreadsheet dos relatórios: " + error.message)
-                })
+        try {
+            rawResponse = resumo.trim().replace(/^```json\n?/, "").replace(/```$/, "").trim();
+            //alert(JSON.stringify(rawResponse))
+            comentarios = JSON.parse(rawResponse);
+        } catch (error) {
+            alert("Erro a processar os comentários. Erro: " + JSON.stringify(error.message));
+        }
+
+        checkExist("Relatorio", sheetID).then(() => {
+            createNewSheet(sheetID, "Relatorio").then(() => {
+                fillRelatorioAux(informacoes, severidade, comentarios, sheetID)
             }).catch(error => {
                 alert("Erro a criar a Spreadsheet dos relatórios: " + error.message)
             })
-
+        }).catch(error => {
+            alert("Erro a criar a Spreadsheet dos relatórios: " + error.message)
         })
-        .catch(error => {
-            alert("Ollama não está a funcionar.");
-            checkExist("Relatorio", sheetID).then(() => {
-                createNewSheet(sheetID, "Relatorio").then(() => {
-                    fillRelatorioAux(informacoes, severidade, comentarios, sheetID)
-                }).catch(error => {
-                    alert("Erro a criar a Spreadsheet dos relatórios: " + error.message)
-                })
-            }).catch(error => {
-                alert("Erro a criar a Spreadsheet dos relatórios: " + error.message)
-            })
-        });
+    });
 }
 
 
@@ -952,11 +921,11 @@ function importRelatorio() {
                 loadGapiWithAuth(token).then(() => {
                     document.getElementById("textoLoading").innerHTML = "A autenticar o utilizador na google..."
                     fillRelatorio(sheet_id)
-                    }).catch(error => {
-                        alert("Erro a autenticar o utilizador na google")
-                    });
+                }).catch(error => {
+                    alert("Erro a autenticar o utilizador na google")
+                });
 
-                
+
 
             } catch (e) {
                 alert("Erro ao processar o JSON: " + e.message);

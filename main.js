@@ -5,6 +5,8 @@ const { google } = require("googleapis");
 const express = require("express");
 const fs = require('fs');
 const path = require('path');
+const { GoogleGenAI } = require("@google/genai");
+
 
 let win;
 app.whenReady().then(() => {
@@ -144,6 +146,30 @@ ipcMain.handle('show-confirmation-dialog', async (event, options) => {
         message: options.message || "Tem a certeza?",
     });
     return result.response; // 0 = Cancel, 1 = Yes
+});
+
+
+
+const ai = new GoogleGenAI({ apiKey: process.env.GEMINI_API_KEY });
+
+
+ipcMain.on("resumir-comentarios", async (event, comentarios) => {
+    const response = await ai.models.generateContent({
+        model: "gemini-2.0-flash",
+        contents: `Recebes um dicionário onde cada chave é um passo e o valor é uma lista de 4 comentários.
+
+            Tarefa:
+            1. Resume cada comentário em até 6 palavras.
+            2. Se um comentário for irrelevante ou incompreensível, escreve apenas '-'.
+            3. Devolve apenas o dicionário final, como JSON. Sem texto extra antes nem depois.
+            4. Cada chave deve ter sempre a mesma estrutura de 4 comentarios, mesmo que sejam strings vazias.
+            É MUITO IMPORTANTE QUE DEVOLVAS APENAS O DICIONARIO SEM TEXTO ANTES NEM DEPOIS.
+
+            Aqui está o dicionário:\n${JSON.stringify(comentarios)}`,
+    });
+    console.log(response.text);
+
+    event.reply("resumo-pronto", response.text);
 });
 
 
