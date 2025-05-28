@@ -30,8 +30,7 @@ app.whenReady().then(() => {
 
     win.setIgnoreMouseEvents(false); // Allows clicks to pass through
     win.loadFile("src/menu.html");
-
-
+    //win.webContents.openDevTools();
 
 });
 
@@ -91,8 +90,7 @@ ipcMain.on("preencher-CW", () => {
 const axeCorePath = require.resolve('axe-core/axe.min.js');
 const axeScript = fs.readFileSync(axeCorePath, 'utf8');
 
-ipcMain.on("medir-acesibilidade", async (event, url) => {
-
+ipcMain.handle("medir-acesibilidade", async (event, url) => {
     const win = new BrowserWindow({
         show: false, // Set to true if you want to see the browser
         webPreferences: {
@@ -104,22 +102,22 @@ ipcMain.on("medir-acesibilidade", async (event, url) => {
     try {
         await win.loadURL(url);
 
-        // Inject axe-core into the page
         await win.webContents.executeJavaScript(axeScript);
 
-        // Run axe-core analysis
         const results = await win.webContents.executeJavaScript(`
-      axe.run().then(results => results);
-    `);
+            axe.run().then(results => results);
+        `);
 
-        console.log(results)
-        // Send results back to the renderer process
-        event.sender.send("resultado-acesibilidade", results);
+        console.log(results);
+        console.log("TESTEEE");
+
+        win.close();
+
+        // Return the results
+        return JSON.parse(JSON.stringify(results));
     } catch (error) {
         console.error("Erro ao medir acessibilidade:", error);
-        event.sender.send("resultado-acesibilidade", { error: error.message });
-    } finally {
-        win.close();
+        throw new Error(`Erro ao medir acessibilidade: ${error.message}`);
     }
 });
 

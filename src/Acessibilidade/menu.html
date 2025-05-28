@@ -16,7 +16,7 @@
         <button onclick="resizeWindow()" class="leftArrow" id="seta">
             <i data-lucide="chevron-right" id="toggleIcon"></i>
         </button>
-        <div class="container" id="contentA">
+        <div class="container" id="contentContainer">
             <div class="content" id="contentFrame">
                 <div class="header">
                     <div class="cogst">
@@ -26,8 +26,37 @@
                         <i data-lucide="help-circle"></i>
                     </a>
                 </div>
+                <div class="analiseResultados" id="resultadosAxe">
+                    <h3 class="section-title">Resultados</h3>
 
-                <div class="form-section">
+                    <div class="hidden-container">
+                        <button class="toggle-button" onclick="toggleDetails(1)">Problemas</button>
+                        <div class="hidden-content" id="details1">
+                            <div id="lista1">
+                            </div>
+                        </div>
+                        <br>
+                        <button class="toggle-button" onclick="toggleDetails(2)">Incompleto</button>
+                        <div class="hidden-content" id="details2">
+                            <ul id="lista2">
+                            </ul>
+                        </div>
+                        <br>
+                        <button class="toggle-button" onclick="toggleDetails(3)">Não se aplica</button>
+                        <div class="hidden-content" id="details3">
+                            <ul id="lista3">
+                            </ul>
+                        </div>
+                        <br>
+                        <button class="toggle-button" onclick="toggleDetails(4)">Passou</button>
+                        <div class="hidden-content" id="details4">
+                            <ul id="lista4">
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="form-section" id="formsAxe">
                     <h3 class="section-title">Medir Acessibilidade</h3>
 
                     <form id="form-inicio" class="cw-form">
@@ -36,7 +65,8 @@
                             <textarea id="site-analise" rows="1"></textarea>
                         </div>
                         <div style="display: flex; justify-content: center;">
-                            <button onclick="runTestsAcessibility()" class="btn btn-success">
+                            <button onclick="runTestsAcessibility()" class="btn btn-success" id="run-button"
+                                type="button">
                                 <i data-lucide="search-code"></i>
                                 Salvar e Analisar
                             </button>
@@ -58,33 +88,6 @@
     </div>
 
     <script src="main.js"></script>
-    <script>
-        lucide.createIcons();
-
-        let isExpanded = true;
-        const toggleButton = document.getElementById('toggleButton');
-        const sidebarTab = document.getElementById('sidebarTab');
-        const toggleIcon = document.getElementById('toggleIcon');
-        const contentContainer = document.getElementById('contentA');
-
-        function resizeWindow() {
-            isExpanded = !isExpanded;
-
-            if (isExpanded) {
-                sidebarTab.style.width = 'var(--tab-width)';
-                contentContainer.style.opacity = '1';
-                contentContainer.style.width = '90%';
-                toggleIcon.setAttribute('name', 'chevron-right');
-            } else {
-                sidebarTab.style.width = 'var(--collapsed-width)';
-                contentContainer.style.opacity = '0';
-                contentContainer.style.width = '0';
-                toggleIcon.setAttribute('name', 'chevron-left');
-            }
-        }
-
-        toggleButton.addEventListener('click', resizeWindow);
-    </script>
 </body>
 
 </html>
