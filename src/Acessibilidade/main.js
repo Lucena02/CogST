@@ -3,8 +3,6 @@ let isExpanded = true;
 let resultadosShowing = false;
 function resizeWindow() {
 
-    const toggleButton = document.getElementById('toggleButton');
-    const sidebarTab = document.getElementById('sidebarTab');
     const toggleIcon = document.getElementById('toggleIcon');
     const contentContainer = document.getElementById('contentContainer');
 
@@ -75,6 +73,31 @@ async function runTestsAcessibility() {
             // Add the complete violation block to the container
             resultsContainer.appendChild(violationDiv);
         })
+
+        const resultsContainer2 = document.getElementById("lista2");
+        result["incomplete"].forEach(incomplete => {
+
+            const incompleteDiv = document.createElement("div");
+            incompleteDiv.classList.add("incomplete-entry");
+
+            const description = document.createElement("p");
+            description.innerHTML = `<strong>Descrição:</strong> ${incomplete.description || "Unknown"}`;
+            incompleteDiv.appendChild(description);
+
+            const helpURL = document.createElement("button");
+            helpURL.onclick = () => {
+                window.open(incomplete.helpUrl, "_blank");
+            };
+            helpURL.innerHTML = `Learn More <i data-lucide="help-circle"></i>`;
+            incompleteDiv.appendChild(helpURL);
+
+            const separator = document.createElement("hr");
+            incompleteDiv.appendChild(separator);
+
+            // Add the complete violation block to the container
+            resultsContainer2.appendChild(incompleteDiv);
+        })
+
         document.getElementById("formsAxe").style.display = "none"
         document.getElementById("resultadosAxe").style.display = "block"
     } catch (err) {
