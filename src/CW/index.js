@@ -164,6 +164,8 @@ function removeForm(numeroPasso) {
 
 
 let state = 0
+let timeStamps = {}
+let timeInit = null
 
 // 0 -> Modo criação; 1 -> Modo edição
 function executeWalkthrough(indexPasso, flag) {
@@ -181,7 +183,7 @@ function executeWalkthrough(indexPasso, flag) {
 
     if (state == 0) {
         passos.style.display = "none"
-
+        timeInit = Date.now()
         if (!iframe0) {
             putIframe(0, indexPasso)
             // Para alterar o texto dentro do iframe0 para o nome do passo (Para os casos do import)
@@ -277,6 +279,9 @@ function executeWalkthrough(indexPasso, flag) {
         state += 1
     }
     else if (state == 5) {
+        timeStamps["passo" + indexPasso] = (Date.now() - timeInit) / 1000
+        timeInit = null
+        alert(JSON.stringify(timeStamps["passo" + indexPasso]))
         iframe4.style.display = "none"
         passos.style.display = "flex"
         botoes.style.display = "none"
@@ -518,8 +523,9 @@ function checkExist(nomeDaSheet, spreadsheetId) {
 function fillSheet(data, spreadsheetId) {
     const tamanho = Object.keys(data).length
     const sheetName = localStorage.getItem('nome_user'); // Get the sheet name
-    const range = `${sheetName}!A1:E${tamanho}`;
+    const range = `${sheetName}!A1:F${tamanho}`;
     const valueInputOption = "RAW";
+    alert(JSON.stringify(data, null, 2));
 
     const values = [
         [
@@ -527,7 +533,8 @@ function fillSheet(data, spreadsheetId) {
             "O utilizador vai \ntentar executar a \nação correta?",
             "O utilizador percebe \nque a ação correta \nestá disponível?",
             "O utilizador associará\n a ação correta com\n o resultado esperado?",
-            "O utilizador receberá\n feedback adequado e\n perceberá que está\n a avançar na sua tarefa?"
+            "O utilizador receberá\n feedback adequado e\n perceberá que está\n a avançar na sua tarefa?",
+            "Tempo a avaliar (s)"
         ]
     ];
     Object.keys(data).forEach(key => {
@@ -548,11 +555,18 @@ function fillSheet(data, spreadsheetId) {
                 }
 
             }
-
+            if (timeStamps[key] != 0) {
+                array.push(timeStamps[key])
+            }
+            else {
+                array.push("0")
+            }
             values.push(array)
         }
-    });
 
+    });
+    alert(JSON.stringify(timeStamps, null, 2));
+    alert(JSON.stringify(values, null, 2));
     const body = { values: values };
 
     // First, update cell values
@@ -564,7 +578,7 @@ function fillSheet(data, spreadsheetId) {
     }).then((response) => {
         // Now, update background color, text formatting, and column width
         applyFormatting(spreadsheetId, sheetName);
-        applyConditionalFormatting(spreadsheetId, sheetName)
+        //applyConditionalFormatting(spreadsheetId, sheetName)
 
         document.getElementById("spinner").style.display = "none"
         document.getElementById("textoLoading").innerHTML = "CW executado com sucesso!"
@@ -594,7 +608,7 @@ function applyFormatting(spreadsheetId, sheetName) {
                         startRowIndex: 0, // First row
                         endRowIndex: 1,
                         startColumnIndex: 1, // Column B
-                        endColumnIndex: 5   // Column E
+                        endColumnIndex: 7   // Column G
                     },
                     cell: {
                         userEnteredFormat: {
@@ -613,7 +627,7 @@ function applyFormatting(spreadsheetId, sheetName) {
                         sheetId: sheetId,
                         dimension: "COLUMNS",
                         startIndex: 1, // Column B
-                        endIndex: 5    // Column E
+                        endIndex: 7    // Column G
                     },
                     properties: {
                         pixelSize: 250 // Adjust the column width (increase this value for wider columns)
@@ -693,18 +707,23 @@ async function fillRelatorio(sheetID) {
     let informacoes = {}
     let severidade = {}
     let comentarios = {}
-    const numeroEvals = Object.keys(allSheetData).length - 1 // Obter o total de páginas para fazer a média
+    let tempo = {}
+    const numeroEvals = Object.keys(allSheetData).length// Obter o total de páginas para fazer a média
     Object.keys(allSheetData).forEach(key => {
+        //alert(JSON.stringify(allSheetData, null, 2))
         const sheet = allSheetData[key]
         if (sheet && sheet.length > 1) {
             for (let i = 1; i < sheet.length; i++) {
                 const nomePasso = sheet[i][0];
-
                 if (!(nomePasso in informacoes)) {
                     informacoes[nomePasso] = [0, 0, 0, 0];
                     severidade[nomePasso] = [0, 0, 0, 0];
                     comentarios[nomePasso] = ["", "", "", ""];
+                    tempo[nomePasso] = 0
                 }
+                const normalizedValue = (sheet[i][5]).replace(',', '.')
+                tempo[nomePasso] += Number(normalizedValue)
+
                 for (let j = 1; j < 5; j++) {
                     if (sheet[i][j].startsWith("Não")) {
                         informacoes[sheet[i][0]][j - 1] += 1
@@ -720,16 +739,22 @@ async function fillRelatorio(sheetID) {
             }
         }
     })
-
+    //alert("INFO: " + JSON.stringify(tempo))
     //alert("INFO: " + JSON.stringify(informacoes))
     //alert("Severidade: " + JSON.stringify(severidade))
     //alert("Comentarios: " + JSON.stringify(comentarios))
+    score = {}
     // Calcular severidade média
     Object.keys(severidade).forEach(key => {
+        score[key] = 0
         for (let i = 0; i < 4; i++) {
             severidade[key][i] = (severidade[key][i]) / numeroEvals
+            score[key] += severidade[key][i] * informacoes[key][i]
         }
+        tempo[key] = (tempo[key] / numeroEvals).toFixed(2)
+
     })
+
     //alert("Severidade Média: " + JSON.stringify(severidade))
     document.getElementById("textoLoading").innerHTML = "A resumir comentários..."
     //Resumir os comentarios todos
@@ -746,12 +771,11 @@ async function fillRelatorio(sheetID) {
             alert("Erro a processar os comentários. Erro: " + JSON.stringify(error.message));
         }
 
-        checkExist("Relatorio", sheetID).then(() => {
-            createNewSheet(sheetID, "Relatorio").then(() => {
-                fillRelatorioAux(informacoes, severidade, comentarios, sheetID)
-            }).catch(error => {
-                alert("Erro a criar a Spreadsheet dos relatórios: " + error.message)
-            })
+
+        createNewSheet(sheetID, "Relatorio").then(() => {
+            fillRelatorioAux(informacoes, severidade, comentarios, tempo, score, sheetID)
+        }).catch(error => {
+            alert("Erro a criar a Spreadsheet dos relatórios: " + error.message)
         }).catch(error => {
             alert("Erro a criar a Spreadsheet dos relatórios: " + error.message)
         })
@@ -759,9 +783,9 @@ async function fillRelatorio(sheetID) {
 }
 
 
-function fillRelatorioAux(data, severidade, comentarios, spreadsheetId) {
+function fillRelatorioAux(data, severidade, comentarios, tempo, score, spreadsheetId) {
     const tamanho = (Object.keys(data).length) + 1
-    const range = `Relatorio!A1:E${tamanho}`;
+    const range = `Relatorio!A1:G${tamanho}`;
     const valueInputOption = "RAW";
 
     const values = [
@@ -770,19 +794,24 @@ function fillRelatorioAux(data, severidade, comentarios, spreadsheetId) {
             "O utilizador vai \ntentar executar a \nação correta?",
             "O utilizador percebe \nque a ação correta \nestá disponível?",
             "O utilizador associará\n a ação correta com\n o resultado esperado?",
-            "O utilizador receberá\n feedback adequado e\n perceberá que está\n a avançar na sua tarefa?"
+            "O utilizador receberá\n feedback adequado e\n perceberá que está\n a avançar na sua tarefa?",
+            "Score",
+            "Tempo Médio por Avaliador"
         ]
     ];
 
     Object.keys(data).forEach(key => {
         for (let i = 0; i < 4; i++) {
-            let string = "Problemas: " + (data[key][i]).toString() + " (Severidade Média - " + (severidade[key][i]).toString() + ")\n"
+            let string = "Problemas: " + (data[key][i]).toString() + "\nSeveridade Média - " + (severidade[key][i]).toString() + "\n"
             if (comentarios != null && comentarios[key][i] != undefined) {
                 string += comentarios[key][i].toString()
             }
             data[key][i] = string
         }
         data[key].unshift(key)
+        data[key].push(Number(score[key]));
+        data[key].push(Number(tempo[key]));
+        alert(JSON.stringify(data[key], null, 2))
         values.push(data[key])
     })
 
@@ -798,6 +827,7 @@ function fillRelatorioAux(data, severidade, comentarios, spreadsheetId) {
     }).then((response) => {
 
         applyFormatting(spreadsheetId, "Relatorio");
+        applyHeatmap(spreadsheetId, "Relatorio")
         document.getElementById("spinner").style.display = "none"
         document.getElementById("textoLoading").innerHTML = "Relatório criado com sucesso!"
         document.getElementById("loadingDone").style.display = "flex"
@@ -806,79 +836,67 @@ function fillRelatorioAux(data, severidade, comentarios, spreadsheetId) {
     });
 }
 
-function applyConditionalFormatting(sheetId, sheetName) {
-    const range = `${sheetName}!A1:E2`;  // Defina o intervalo diretamente
+function applyHeatmap(spreadsheetId, sheetName) {
+    gapi.client.sheets.spreadsheets.get({ spreadsheetId: spreadsheetId }).then((response) => {
+        const sheet = response.result.sheets.find(sheet => sheet.properties.title === sheetName);
+        const sheetId = sheet.properties.sheetId;
 
-    const requests = [
-        {
-            "addConditionalFormatRule": {
-                "rule": {
-                    "ranges": [
-                        {
-                            "sheetId": sheetId,
-                            "startRowIndex": 0,
-                            "endRowIndex": 100,
-                            "startColumnIndex": 0,
-                            "endColumnIndex": 1
+        const requests = [
+            // Heatmap for column F (index 5)
+            {
+                addConditionalFormatRule: {
+                    rule: {
+                        ranges: [
+                            {
+                                sheetId: sheetId,
+                                startRowIndex: 1, // Skip header row
+                                startColumnIndex: 5, // Column F
+                                endColumnIndex: 6
+                            }
+                        ],
+                        gradientRule: {
+                            minpoint: { color: { red: 0.0, green: 1.0, blue: 0.0 }, type: 'MIN' }, // Green
+                            midpoint: { color: { red: 1.0, green: 1.0, blue: 0.0 }, type: 'PERCENTILE', value: '50' }, // Yellow at median
+                            maxpoint: { color: { red: 1.0, green: 0.0, blue: 0.0 }, type: 'MAX' } // Red
                         }
-                    ],
-                    "booleanRule": {
-                        "condition": {
-                            "type": "TEXT_CONTAINS",
-                            "values": [
-                                { "userEnteredValue": "Sim" }
-                            ]
-                        },
-                        "format": {
-                            "backgroundColor": { "red": 0.0, "green": 0.4, "blue": 0.0 }
+                    },
+                    index: 0
+                }
+            },
+            // Heatmap for column G (index 6)
+            {
+                addConditionalFormatRule: {
+                    rule: {
+                        ranges: [
+                            {
+                                sheetId: sheetId,
+                                startRowIndex: 1, // Skip header row
+                                startColumnIndex: 6, // Column G
+                                endColumnIndex: 7
+                            }
+                        ],
+                        gradientRule: {
+                            minpoint: { color: { red: 0.0, green: 1.0, blue: 0.0 }, type: 'MIN' }, // Green
+                            midpoint: { color: { red: 1.0, green: 1.0, blue: 0.0 }, type: 'PERCENTILE', value: '50' }, // Yellow at median
+                            maxpoint: { color: { red: 1.0, green: 0.0, blue: 0.0 }, type: 'MAX' } // Red
                         }
-                    }
-                },
-                "index": 0
+                    },
+                    index: 0
+                }
             }
-        },
-        {
-            "addConditionalFormatRule": {
-                "rule": {
-                    "ranges": [
-                        {
-                            "sheetId": sheetId,
-                            "startRowIndex": 0,
-                            "endRowIndex": 100,
-                            "startColumnIndex": 0,
-                            "endColumnIndex": 1
-                        }
-                    ],
-                    "booleanRule": {
-                        "condition": {
-                            "type": "TEXT_CONTAINS",
-                            "values": [
-                                { "userEnteredValue": "Não" }
-                            ]
-                        },
-                        "format": {
-                            "backgroundColor": { "red": 0.4, "green": 0.0, "blue": 0.0 }
-                        }
-                    }
-                },
-                "index": 1
-            }
-        }
-    ];
+        ];
 
-    // Aplicando a formatação condicional à planilha
-    gapi.client.sheets.spreadsheets.batchUpdate({
-        spreadsheetId: sheetId,
-        requests: requests
+        return gapi.client.sheets.spreadsheets.batchUpdate({
+            spreadsheetId: spreadsheetId,
+            resource: { requests: requests }
+        });
     }).then((response) => {
-        console.log('Conditional formatting applied successfully:', response);
-    }, (error) => {
-        console.error('Error applying conditional formatting:', error);
+        alert("done")
+        console.log("Heatmap applied successfully:", response);
+    }).catch(error => {
+        console.error("Error applying heatmap:", error);
     });
 }
-
-
-
 
 
 
@@ -920,7 +938,11 @@ function importRelatorio() {
                 const username = localStorage.getItem('nome_user')
                 loadGapiWithAuth(token).then(() => {
                     document.getElementById("textoLoading").innerHTML = "A autenticar o utilizador na google..."
-                    fillRelatorio(sheet_id)
+                    checkExist("Relatorio", sheet_id).then((response) => {
+                        fillRelatorio(sheet_id)
+                    })
+
+
                 }).catch(error => {
                     alert("Erro a autenticar o utilizador na google")
                 });

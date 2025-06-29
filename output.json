@@ -1,0 +1,28 @@
+{
+    "mobile": [
+        "❌ Scroll Horizontal",
+        "⚠️ NAO ESTÁ RESPONSIVO(I vs I). Elemento 1 -> Tag: A Class:  Id: youtube Elemento 2 -> Tag: A Class:  Id: git",
+        "⚠️ NAO ESTÁ RESPONSIVO(I vs I). Elemento 1 -> Tag: A Class:  Id: curso Elemento 2 -> Tag: A Class:  Id: mail",
+        "⚠️ NAO ESTÁ RESPONSIVO(I vs I). Elemento 1 -> Tag: A Class:  Id: reddit Elemento 2 -> Tag: A Class:  Id: pa",
+        "⚠️ NAO ESTÁ RESPONSIVO(I vs I). Elemento 1 -> Tag: A Class:  Id: reddit Elemento 2 -> Tag: A Class:  Id: di",
+        "⚠️ NAO ESTÁ RESPONSIVO(I vs I). Elemento 1 -> Tag: A Class:  Id: pa Elemento 2 -> Tag: A Class:  Id: git",
+        "⚠️ NAO ESTÁ RESPONSIVO(I vs I). Elemento 1 -> Tag: A Class:  Id: di Elemento 2 -> Tag: A Class:  Id: git",
+        "⚠️ NAO ESTÁ RESPONSIVO(I vs I). Elemento 1 -> Tag: A Class:  Id: di Elemento 2 -> Tag: A Class:  Id: pa",
+        "⚠️ Conteúdo possivelmente escondido por overflow/truncamento: Tag: INPUT Class: ",
+        "⚠️ Elemento com posição fixed/absolute -> Verificar manualmente: Tag: P Class: awesome"
+    ],
+    "tablet": [
+        "❌ Scroll Horizontal",
+        "⚠️ NAO ESTÁ RESPONSIVO(I vs I). Elemento 1 -> Tag: A Class:  Id: reddit Elemento 2 -> Tag: A Class:  Id: di",
+        "⚠️ NAO ESTÁ RESPONSIVO(I vs I). Elemento 1 -> Tag: A Class:  Id: pa Elemento 2 -> Tag: A Class:  Id: curso",
+        "⚠️ NAO ESTÁ RESPONSIVO(I vs I). Elemento 1 -> Tag: A Class:  Id: pa Elemento 2 -> Tag: A Class:  Id: reddit",
+        "⚠️ NAO ESTÁ RESPONSIVO(I vs I). Elemento 1 -> Tag: A Class:  Id: pa Elemento 2 -> Tag: A Class:  Id: git",
+        "⚠️ NAO ESTÁ RESPONSIVO(I vs I). Elemento 1 -> Tag: A Class:  Id: pa Elemento 2 -> Tag: A Class:  Id: mail",
+        "⚠️ NAO ESTÁ RESPONSIVO(I vs I). Elemento 1 -> Tag: A Class:  Id: pa Elemento 2 -> Tag: A Class:  Id: di",
+        "⚠️ NAO ESTÁ RESPONSIVO(I vs I). Elemento 1 -> Tag: A Class:  Id: di Elemento 2 -> Tag: A Class:  Id: git",
+        "⚠️ Elemento com posição fixed/absolute -> Verificar manualmente: Tag: P Class: awesome"
+    ],
+    "desktop": [
+        "⚠️ Elemento com posição fixed/absolute -> Verificar manualmente: Tag: P Class: awesome"
+    ]
+}

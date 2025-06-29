@@ -12,6 +12,7 @@ contextBridge.exposeInMainWorld("electronAPI", {
     send: (channel, data) => ipcRenderer.send(channel, data),
     receive: (channel, func) => ipcRenderer.once(channel, (event, ...args) => func(...args)),
     runAxeTest: (url) => ipcRenderer.invoke("medir-acesibilidade", url),
+    runRespTest: (url) => ipcRenderer.invoke("medir-responsividade", url),
     showConfirmationDialog: (options) => ipcRenderer.invoke('show-confirmation-dialog', options),
     onAccessToken: (callback) => ipcRenderer.on('access-token', callback),
     doLogin: () => ipcRenderer.send("login"),

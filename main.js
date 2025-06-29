@@ -6,7 +6,7 @@ const express = require("express");
 const fs = require('fs');
 const path = require('path');
 const { GoogleGenAI } = require("@google/genai");
-
+const { exec } = require('child_process');
 
 let win;
 app.whenReady().then(() => {
@@ -69,6 +69,12 @@ ipcMain.on("acessibilidade-main-app", () => {
     }
 });
 
+ipcMain.on("responsividade-main-app", () => {
+    if (win) {
+        win.loadFile("src/Responsividade/menu.html");
+    }
+});
+
 ipcMain.on("definir-CW", () => {
     if (win) {
         win.loadFile("src/CW/definirCW.html");
@@ -120,6 +126,38 @@ ipcMain.handle("medir-acesibilidade", async (event, url) => {
         throw new Error(`Erro ao medir acessibilidade: ${error.message}`);
     }
 });
+
+ipcMain.handle("medir-responsividade", async (event, url) => {
+
+    try {
+        const result = await runCommand('node testes.js ' + url);
+
+        console.log(`Corri Responsividade`);
+
+        const data = fs.readFileSync('output.json', 'utf-8');
+        const jsonData = JSON.parse(data);
+
+        return jsonData;
+
+    } catch (error) {
+        console.error("Erro ao medir responsividade:", error);
+        throw new Error(`Erro ao medir responsividade: ${error.message}`);
+    }
+});
+
+function runCommand(command) {
+    return new Promise((resolve, reject) => {
+        exec(command, (error, stdout, stderr) => {
+            if (error) {
+                return reject(error);
+            }
+            if (stderr) {
+                return reject(new Error(stderr));
+            }
+            resolve(stdout); // Return the output if you want to log it
+        });
+    });
+}
 
 ipcMain.on("update-window-width", (event, newWidth) => {
     const { width, height } = screen.getPrimaryDisplay().bounds;

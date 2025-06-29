@@ -16,7 +16,7 @@
                 <span>Fazer CW</span>
             </button>
 
-            <button onclick="" class="action-button">
+            <button class="action-button" id="responsibilidadeButton">
                 <i data-lucide="monitor-smartphone"></i>
                 <span>Avaliar Responsividade</span>
             </button>
@@ -36,6 +36,9 @@
         lucide.createIcons();
         document.getElementById('startBtn').addEventListener('click', () => {
             window.electronAPI.send('start-main-app');
+        });
+        document.getElementById('responsibilidadeButton').addEventListener('click', () => {
+            window.electronAPI.send('responsividade-main-app');
         });
         document.getElementById('acessibilidadeButton').addEventListener('click', () => {
             window.electronAPI.send('acessibilidade-main-app');

@@ -16,7 +16,10 @@
         <button onclick="resizeWindow()" class="leftArrow" id="seta">
             <i data-lucide="chevron-right" id="toggleIcon"></i>
         </button>
+
+
         <div class="container" id="contentContainer">
+
             <div class="content" id="contentFrame">
                 <div class="header">
                     <div class="cogst">
@@ -26,34 +29,44 @@
                         <i data-lucide="help-circle"></i>
                     </a>
                 </div>
+                <div class="containerLoading" id="loading">
+                    <div class="spinner" id="spinner"></div>
+                    <div id="textoLoading"></div>
+                </div>
                 <div class="analiseResultados" id="resultadosAxe">
                     <h3 class="section-title">Resultados</h3>
 
                     <div class="hidden-container">
-                        <button class="toggle-button" onclick="toggleDetails(1)">Problemas</button>
+                        <button class="toggle-button" onclick="toggleDetails(1)">Mobile</button>
                         <div class="hidden-content" id="details1">
                             <div id="lista1">
                             </div>
                         </div>
                         <br>
-                        <button class="toggle-button" onclick="toggleDetails(2)">Incompleto</button>
+                        <button class="toggle-button" onclick="toggleDetails(2)">Tablet</button>
                         <div class="hidden-content" id="details2">
                             <ul id="lista2">
+                            </ul>
+                        </div>
+                        <button class="toggle-button" onclick="toggleDetails(3)">Desktop</button>
+                        <div class="hidden-content" id="details3">
+                            <ul id="lista3">
                             </ul>
                         </div>
                     </div>
                 </div>
 
                 <div class="form-section" id="formsAxe">
-                    <h3 class="section-title">Medir Acessibilidade</h3>
+                    <h3 class="section-title">Medir Responsividade</h3>
 
                     <form id="form-inicio" class="cw-form">
                         <div class="form-group">
                             <label for="site-analise">Site a analisar</label>
                             <textarea id="site-analise" rows="1"></textarea>
+                            <div class="errorInfo" id="error">Por favor escreve um URL válido</div>
                         </div>
                         <div style="display: flex; justify-content: center;">
-                            <button onclick="runTestsAcessibility()" class="btn btn-success" id="run-button"
+                            <button onclick="runResponsivenessCheck()" class="btn btn-success" id="run-button"
                                 type="button">
                                 <i data-lucide="search-code"></i>
                                 Salvar e Analisar
@@ -66,7 +79,6 @@
             </div>
 
             <div id="botaoFim" class="export-button">
-
                 <button onclick="retroceder()" class="btn btn-secondary">
                     <i data-lucide="arrow-left"></i>
                     Início
@@ -75,7 +87,7 @@
         </div>
     </div>
 
-    <script src="testes.js"></script>
+    <script src="main.js"></script>
 </body>
 
 </html>
