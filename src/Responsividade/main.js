@@ -46,7 +46,69 @@ async function runResponsivenessCheck() {
         window.electronAPI.updateWindowSize(600)
         document.getElementById("loading").style.display = "none"
         document.getElementById("resultadosAxe").style.display = "block"
+        document.getElementById("legenda").style.display = "block"
+
         resultadosShowing = true
+
+        const resultsContainer1 = document.getElementById("lista1");
+        document.getElementById("texto1").innerHTML = "Mobile - " + result["mobile"].length + " issues"
+        result["mobile"].forEach(issue => {
+
+            const incompleteDiv = document.createElement("div");
+            incompleteDiv.classList.add("issue-entry");
+
+            const description = document.createElement("p");
+            description.innerHTML = `${issue || "Unknown"}`;
+            incompleteDiv.appendChild(description);
+
+
+
+            const separator = document.createElement("hr");
+            incompleteDiv.appendChild(separator);
+
+            // Add the complete violation block to the container
+            resultsContainer1.appendChild(incompleteDiv);
+        })
+
+        const resultsContainer2 = document.getElementById("lista2");
+        document.getElementById("texto2").innerHTML = "Tablet - " + result["tablet"].length + " issues"
+        result["tablet"].forEach(issue => {
+
+            const incompleteDiv = document.createElement("div");
+            incompleteDiv.classList.add("issue-entry");
+
+            const description = document.createElement("p");
+            description.innerHTML = `${issue || "Unknown"}`;
+            incompleteDiv.appendChild(description);
+
+
+
+            const separator = document.createElement("hr");
+            incompleteDiv.appendChild(separator);
+
+            // Add the complete violation block to the container
+            resultsContainer2.appendChild(incompleteDiv);
+        })
+
+        const resultsContainer3 = document.getElementById("lista3");
+        document.getElementById("texto3").innerHTML = "Desktop - " + result["desktop"].length + " issues"
+        result["desktop"].forEach(issue => {
+
+            const incompleteDiv = document.createElement("div");
+            incompleteDiv.classList.add("issue-entry");
+
+            const description = document.createElement("p");
+            description.innerHTML = `${issue || "Unknown"}`;
+            incompleteDiv.appendChild(description);
+
+
+
+            const separator = document.createElement("hr");
+            incompleteDiv.appendChild(separator);
+
+            // Add the complete violation block to the container
+            resultsContainer3.appendChild(incompleteDiv);
+        })
 
     } catch (err) {
         alert("Erro: " + err.message);

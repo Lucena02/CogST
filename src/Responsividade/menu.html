@@ -37,23 +37,26 @@
                     <h3 class="section-title">Resultados</h3>
 
                     <div class="hidden-container">
-                        <button class="toggle-button" onclick="toggleDetails(1)">Mobile</button>
+                        <button class="toggle-button" onclick="toggleDetails(1)" id="texto1">Mobile</button>
                         <div class="hidden-content" id="details1">
                             <div id="lista1">
                             </div>
                         </div>
                         <br>
-                        <button class="toggle-button" onclick="toggleDetails(2)">Tablet</button>
+                        <button class="toggle-button" onclick="toggleDetails(2)" id="texto2">Tablet</button>
                         <div class="hidden-content" id="details2">
                             <ul id="lista2">
                             </ul>
                         </div>
-                        <button class="toggle-button" onclick="toggleDetails(3)">Desktop</button>
+                        <br>
+                        <button class="toggle-button" onclick="toggleDetails(3)" id="texto3">Desktop</button>
                         <div class="hidden-content" id="details3">
                             <ul id="lista3">
                             </ul>
                         </div>
                     </div>
+
+
                 </div>
 
                 <div class="form-section" id="formsAxe">
@@ -77,7 +80,10 @@
 
                 </div>
             </div>
-
+            <div id="legenda" class="legendaClass">
+                <h3>Legenda dos problemas:</h3>
+                <div>🟥 - Critico; 🟧 - Alto; 🟨 - Médio; 🟩 - Baixo</div>
+            </div>
             <div id="botaoFim" class="export-button">
                 <button onclick="retroceder()" class="btn btn-secondary">
                     <i data-lucide="arrow-left"></i>

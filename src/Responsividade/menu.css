@@ -325,11 +325,18 @@ body {
 .hidden-container {
     display: flex;
     flex-direction: column;
-    max-height: 300px;
+    max-height: 250px;
     max-width: 100%;
     overflow-y: auto;
 }
 
 .analiseResultados {
     display: none;
+}
+
+
+
+.legendaClass {
+    display: none;
+    text-align: center;
 }

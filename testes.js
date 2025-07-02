@@ -30,7 +30,7 @@ const fs = require('fs');
         });
         console.log(`→ ${viewport.name}: horizontal scroll? ${hasHorizontalScroll ? '❌ Há scroll horizontal...' : '✅ Sem scroll horizontal!'}`);
         if (hasHorizontalScroll) {
-            issues[viewport.name].push(`❌ Scroll Horizontal`)
+            issues[viewport.name].push(`🟥 Scroll Horizontal Detetado.`)
         }
 
 
@@ -54,12 +54,37 @@ const fs = require('fs');
                     return false
                 }
             }
+            function hasViewportMetaTag() {
+                const metas = document.getElementsByTagName('meta');
+                for (let i = 0; i < metas.length; i++) {
+                    if (metas[i].getAttribute('name') === 'viewport') {
+                        console.log("✅ Viewport meta tag found:", metas[i].getAttribute('content'));
+                        return true;
+                    }
+                }
+                console.warn("❌ Viewport meta tag NOT found!");
+                return false;
+            }
 
+            if (hasViewportMetaTag() == false) {
+                collectedIssues.push("🟧 Nodo viewport não existe")
+            }
 
             // Obter todos os nodos
             const nodos = document.body.getElementsByTagName("*")
             const irmaosMaus = new Set();
             for (const nodo of nodos) {
+                let style = window.getComputedStyle(nodo)
+                if (style.display !== 'none' || style.visibility !== 'hidden' || style.opacity !== '0') {
+                    let tamanhoFonte = parseFloat(style.fontSize);
+
+                    if (tamanhoFonte < 12) {
+                        console.warn("⚠️ Fonte demasiado pequena: ", nodo.tagName, nodo.className);
+                        collectedIssues.push("🟩 Fonte possivelmente difícil de ler (<12px). Elemento -> Tag: " + nodo.tagName + "; Class: " + nodo.className + "; Id: " + nodo.id)
+                    }
+                }
+
+
                 // Verificar altura e largura entre pai/filho
                 if (nodo.childNodes.length != 0 && nodo.nodeType === 1) {
 
@@ -75,15 +100,16 @@ const fs = require('fs');
 
                         // Ignorar elementos com posiçao absolute/fixed
                         if (getComputedStyle(filho).position === "absolute" || getComputedStyle(filho).position === "fixed") {
-                            console.log("⚠️ Elemento com posição fixed/absolute -> Verificar manualmente")
-                            collectedIssues.push("⚠️ Elemento com posição fixed/absolute -> Verificar manualmente: Tag: " + filho.tagName + " Class: " + filho.className)
+                            console.log("🟩 Elemento com posição fixed/absolute -> Necessário verificar manualmente")
+                            collectedIssues.push("🟩 Elemento com posição fixed/absolute -> Verificar manualmente: Tag: " + filho.tagName + "; Class: " + filho.className + "; Id: " + filho.id)
                             continue
                         }
                         // Verificar overflows de cada elemento (No site do JIB, estoura com animaçoes)
-                        if (filho.scrollWidth > filho.clientWidth || filho.scrollHeight > filho.clientHeight) {
-                            console.log("⚠️ Conteúdo possivelmente escondido por overflow/truncamento:", filho.tagName, filho.className);
-                            collectedIssues.push("⚠️ Conteúdo possivelmente escondido por overflow/truncamento: Tag: " + filho.tagName + " Class: " + filho.className)
-                        }
+                        // Removi, não estava a ter bons resultados
+                        // if (filho.scrollWidth > filho.clientWidth || filho.scrollHeight > filho.clientHeight) {
+                        //     console.log("🟨 Conteúdo possivelmente escondido por overflow/truncamento:", filho.tagName, filho.className);
+                        //     collectedIssues.push("🟨 Conteúdo possivelmente escondido por overflow/truncamento: Tag: " + filho.tagName + " Class: " + filho.className)
+                        // }
 
 
 
@@ -94,8 +120,8 @@ const fs = require('fs');
                             console.log("PONTO PAI: " + nodo.className + "   " + nodo.tagName + "   " + "ponto1: (" + infoPai.x + ", " + infoPai.y + ") ponto2: (" + (infoPai.x + infoPai.width) + ", " + (infoPai.y + infoPai.height) + ")")
                             console.log("PONTO FILHO: " + filho.className + "   " + filho.tagName + "   " + "ponto1: (" + infoFilho.x + ", " + infoFilho.y + ") ponto2: (" + (infoFilho.x + infoFilho.width) + ", " + (infoFilho.y + infoFilho.height) + ")")
 
-                            console.log("⚠️ NAO ESTÁ RESPONSIVO (I vs P)->" + filho.tagName + "  " + filho.className + "\n")
-                            collectedIssues.push("⚠️ NAO ESTÁ RESPONSIVO (I vs P). Elemento 1 -> Tag: " + filho.tagName + " Class: " + filho.className + " Id: " + filho.id + " Elemento 2 -> Tag: " + nodo.tagName + " Class: " + nodo.className + " Id: " + nodo.id)
+                            console.log("🟨 NAO ESTÁ RESPONSIVO (I vs P)-> " + filho.tagName + "  " + filho.className + "\n")
+                            collectedIssues.push("🟨 Elemento não responsivo encontrado. Elemento 1 -> Tag: " + filho.tagName + "; Class: " + filho.className + "; Id: " + filho.id + "; Elemento 2 -> Tag: " + nodo.tagName + "; Class: " + nodo.className + "; Id: " + nodo.id)
                         }
 
                         function createKey(el1, el2) {
@@ -117,10 +143,10 @@ const fs = require('fs');
                                     console.log("PONTO FILHO1: " + irmao.className + "   " + irmao.tagName + "   " + "ponto1: (" + infoIrmao.x + ", " + infoIrmao.y + ") ponto2: (" + (infoIrmao.x + infoIrmao.width) + ", " + (infoIrmao.y + infoIrmao.height) + ")")
                                     console.log("PONTO FILHO2: " + filho.className + "   " + filho.tagName + "   " + "ponto1: (" + infoFilho.x + ", " + infoFilho.y + ") ponto2: (" + (infoFilho.x + infoFilho.width) + ", " + (infoFilho.y + infoFilho.height) + ")")
 
-                                    console.log("⚠️ NAO ESTÁ RESPONSIVO (I vs I) ->" + filho.tagName + "  " + filho.className + "  " + filho.id + " VS " + irmao.id + "\n")
-                                    collectedIssues.push("⚠️ NAO ESTÁ RESPONSIVO(I vs I). Elemento 1 -> Tag: " + filho.tagName + " Class: " + filho.className + " Id: " + filho.id + " Elemento 2 -> Tag: " + irmao.tagName + " Class: " + irmao.className + " Id: " + irmao.id)
+                                    console.log("🟨 NAO ESTÁ RESPONSIVO (I vs I) ->" + filho.tagName + "  " + filho.className + "  " + filho.id + " VS " + irmao.id + "\n")
+                                    collectedIssues.push("🟨 Elemento não responsivo encontrado. Elemento 1 -> Tag: " + filho.tagName + "; Class: " + filho.className + "; Id: " + filho.id + "; Elemento 2 -> Tag: " + irmao.tagName + "; Class: " + irmao.className + "; Id: " + irmao.id)
 
-                                    irmaosMaus.add(key);
+                                    irmaosMaus.add(key); // ACHO QUE ESTOU A TER PROBLEMAS COM ELEMENTOS COM ALTURA/LARGURA 0
                                 }
                             }
                         }
@@ -150,3 +176,6 @@ const fs = require('fs');
 
     await browser.close();
 })();
+
+
+// 🟥🟧🟨🟩
