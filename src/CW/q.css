@@ -65,24 +65,6 @@ body {
     position: relative;
 }
 
-.help {
-    position: absolute;
-    top: 0;
-    right: 0;
-    width: 20px;
-    height: 20px;
-    background-color: #b3b3b3;
-    border-radius: 50%;
-    font-weight: bold;
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    text-decoration: none;
-}
-
-.help:hover {
-    background-color: #ff9292;
-}
 
 .cogst {
     font-size: 18px;
@@ -120,4 +102,32 @@ textarea {
 
 .error {
     color: rgb(255, 100, 100)
+}
+
+.help {
+    position: absolute;
+    top: 0;
+    right: 0;
+    width: 24px;
+    height: 24px;
+    background-color: #e2e8f0;
+    border-radius: 50%;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    text-decoration: none;
+    color: var(--text-color);
+    transition: background-color var(--transition-speed);
+}
+
+.icon {
+    position: absolute;
+    top: 0;
+    right: 0;
+    width: 20px;
+    height: 20px;
+}
+
+.help:hover {
+    background-color: #fecaca;
 }

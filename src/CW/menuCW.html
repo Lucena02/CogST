@@ -16,31 +16,34 @@
         <button onclick="resizeWindow()" class="leftArrow" id="toggleButton">
             <i id="toggleIcon" data-lucide="chevron-right"></i>
         </button>
+        <div class="spinner" id="spinnerLoading">
+
+        </div>
         <div class="container" id="contentContainer">
             <div class="content">
                 <div class="header">
                     <div class="cogst">
                         CogST
                     </div>
-                    <a href="#" class="help" title="Help">
+                    <button onclick="getHelp(2)" class="help" title="Help">
                         <i data-lucide="help-circle"></i>
-                    </a>
+                    </button>
                 </div>
 
                 <div class="buttons-container">
                     <button onclick="definirCW()" class="action-button">
                         <i data-lucide="settings"></i>
-                        <span>Definir CW</span>
+                        <span>Create CW</span>
                     </button>
 
                     <button onclick="preencherCW()" class="action-button">
                         <i data-lucide="file-text"></i>
-                        <span>Preencher CW</span>
+                        <span>Fill CW</span>
                     </button>
 
                     <button onclick="gerarRelatorio()" class="action-button">
                         <i data-lucide="file-text"></i>
-                        <span>Criar Relatório</span>
+                        <span>Generate Report</span>
                     </button>
 
                     <br><br><br><br><br><br><br>
@@ -52,12 +55,12 @@
 
                     <button onclick="retroceder()" class="action-button">
                         <i data-lucide="move-left"></i>
-                        <span id="login">Retroceder</span>
+                        <span id="login">Back</span>
                     </button>
 
                     <button onclick="fechar()" class="action-button exit-button">
                         <i data-lucide="door-open"></i>
-                        <span id="login">Fechar</span>
+                        <span id="login">Close</span>
                     </button>
                 </div>
 

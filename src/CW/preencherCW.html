@@ -23,21 +23,21 @@
                     <div class="cogst">
                         CogST
                     </div>
-                    <a href="#" class="help" title="Help">
+                    <button onclick="getHelp(2)" class="help" title="Help">
                         <i data-lucide="help-circle"></i>
-                    </a>
+                    </button>
                 </div>
 
                 <div class="file-input-container">
                     <div class="file-input-wrapper">
                         <input type="file" id="fileInput">
                     </div>
-                    <div id="feedbackImportar" class="feedback-text">Nenhum arquivo selecionado</div>
+                    <div id="feedbackImportar" class="feedback-text">No file selected</div>
                 </div>
 
                 <!-- Import button -->
                 <div id="botoesImportar" class="botoesImportar">
-                    <button onclick="importPassos()" id="importButton">Importar e Começar</button>
+                    <button onclick="importPassos()" id="importButton">Import & Start</button>
                 </div>
 
                 <!-- Error message -->
@@ -50,7 +50,7 @@
             <div id="recuar" class="back-buttons">
                 <button onclick="retrocedeCW2()" class="btn btn-secondary">
                     <i data-lucide="arrow-left"></i>
-                    Início
+                    Back
                 </button>
             </div>
 

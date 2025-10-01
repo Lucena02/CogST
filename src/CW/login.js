@@ -46,7 +46,7 @@ function resizeWindow() {
     }
 }
     */
-// Para verificar se de facto alguem fez login
+// Mudar o botão para "Logout" quando é efetuado o "Login"
 window.electronAPI.onAccessToken((event, accessToken) => {
     const statusElement = document.getElementById('login');
 
@@ -69,10 +69,102 @@ function login() {
     }
 }
 
-// Para mudar o botao para Logout caso haja uma token valida
-if (localStorage.getItem("access_token") != null) {
-    document.getElementById("login").innerHTML = "Logout";
+async function checkToken() {
+    const accessToken = localStorage.getItem("access_token");
+    const refreshToken = localStorage.getItem("refresh_token");
+
+    // No access token stored → user must log in
+    if (!accessToken) {
+        setUI(false);
+        return false;
+    }
+
+    try {
+        const valid = await isTokenValid(accessToken);
+
+        if (!valid) {
+            console.warn("Access token invalid or expired");
+
+            // Attempt silent refresh if refresh token exists
+            if (refreshToken) {
+                const newToken = await refreshAccessToken(refreshToken);
+                if (newToken) {
+                    console.log("Access token refreshed successfully");
+                    setUI(true);
+                    return true;
+                } else {
+                    console.warn("Failed to refresh token");
+                    setUI(false);
+                    return false;
+                }
+            } else {
+                // No refresh token, must log in again
+                setUI(false);
+                return false;
+            }
+        }
+        // Token is still valid
+        setUI(true);
+        return true;
+
+    } catch (err) {
+        setUI(false);
+        return false;
+    }
 }
+
+function setUI(loggedIn) {
+    document.getElementById("login").innerHTML = loggedIn ? "Logout" : "Login";
+    document.getElementById("contentContainer").style.display = "flex";
+    document.getElementById("spinnerLoading").style.display = "none";
+}
+
+checkToken();
+
+
+async function refreshAccessToken() {
+    const refreshToken = localStorage.getItem('refresh_token');
+    if (!refreshToken) return null;
+    return new Promise((resolve) => {
+        window.electronAPI.onAccessTokenRefreshed((newToken) => {
+            if (newToken) {
+                localStorage.setItem('access_token', newToken);
+                resolve(newToken);
+            } else {
+                resolve(null);
+            }
+        });
+        window.electronAPI.refreshAccessToken(refreshToken);
+    });
+}
+
+async function isTokenValid(accessToken) {
+    try {
+        const res = await fetch(
+            `https://www.googleapis.com/oauth2/v3/tokeninfo?access_token=${accessToken}`
+        );
+        if (!res.ok) return false;
+        const data = await res.json();
+
+
+        if (data.expires_in && Number(data.expires_in) > 60) {
+            return true;
+        } else {
+            return false;
+        }
+    } catch (err) {
+        console.error("Token check failed:", err);
+        return false;
+    }
+}
+
+
+
+// alert(localStorage.getItem("access_token"))
+// // Para mudar o botao para Logout caso haja uma token valida
+// if (localStorage.getItem("access_token") != null) {
+//     document.getElementById("login").innerHTML = "Logout";
+// }
 
 window.googleFormsVar = null
 window.tarefaVar = null
@@ -96,7 +188,7 @@ function definirCW() {
 
 function preencherCW() {
     if (localStorage.getItem("access_token") == null) {
-        document.getElementById("error").innerHTML = "Por favor faça login primeiro"
+        alert("Please login first")
     }
     else {
         window.electronAPI.send("preencher-CW")
@@ -105,14 +197,19 @@ function preencherCW() {
 }
 
 function gerarRelatorio() {
-    window.electronAPI.send("definir-relatorio")
+    if (localStorage.getItem("access_token") == null) {
+        alert("Please login first")
+    }
+    else {
+        window.electronAPI.send("definir-relatorio")
+    }
 }
 
 async function retrocederCW() {
     const result = await window.electronAPI.showConfirmationDialog({
-        title: "Confirmar Retrocesso",
-        message: "Tem a certeza que quer retroceder? Todo o progresso será perdido.",
-        buttons: ["Cancelar", "Sim"]
+        title: "Confirm",
+        message: "Are you sure you want to go back? All progress will be lost",
+        buttons: ["Cancel", "Yes"]
     });
 
     if (result === 1) {
@@ -125,11 +222,13 @@ function fechar() {
     window.electronAPI.send("fechaTudo")
 }
 
-function retroceder(){
+function retroceder() {
     window.electronAPI.send("go-back")
 }
 
-
+function getHelp() {
+    window.electronAPI.send("getHelp")
+}
 
 function exportPassos() {
     const passosData = {};
@@ -175,3 +274,4 @@ function exportPassos() {
     a.click();
     document.body.removeChild(a);
 }
+

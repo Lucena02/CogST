@@ -7,6 +7,8 @@ const fs = require('fs');
 const path = require('path');
 const { GoogleGenAI } = require("@google/genai");
 const { exec } = require('child_process');
+const { shell } = require("electron");
+
 
 let win;
 app.whenReady().then(() => {
@@ -52,6 +54,11 @@ ipcMain.on("go-back", (event) => {
     }
 });
 
+ipcMain.on("getHelp", (event) => {
+    const helpFile = path.join(__dirname, "/src/help/help.html");
+    shell.openExternal(`file://${helpFile}`);
+});
+
 ipcMain.on("login", (event) => {
     authenticateUser();
 });
@@ -92,6 +99,8 @@ ipcMain.on("preencher-CW", () => {
         win.loadFile("src/CW/preencherCW.html");
     }
 });
+
+
 
 const axeCorePath = require.resolve('axe-core/axe.min.js');
 const axeScript = fs.readFileSync(axeCorePath, 'utf8');
@@ -215,10 +224,8 @@ const CLIENT_ID = process.env.ID_CLIENTE;
 const CLIENT_SECRET = process.env.SECRET_CLIENTE;
 const REDIRECT_URI = "http://localhost:3000";
 const SCOPES = [
-    "openid",
-    "profile",
-    "email",
-    "https://www.googleapis.com/auth/spreadsheets"
+    "https://www.googleapis.com/auth/spreadsheets",
+    "https://www.googleapis.com/auth/userinfo.profile"
 ];
 
 const oauth2Client = new google.auth.OAuth2(
@@ -230,12 +237,31 @@ const oauth2Client = new google.auth.OAuth2(
 async function authenticateUser() {
     const authUrl = oauth2Client.generateAuthUrl({
         access_type: "offline",
+        prompt: "consent",
         scope: SCOPES,
     });
 
     let win = new BrowserWindow({ width: 800, height: 600 });
     win.loadURL(authUrl);
 }
+
+ipcMain.on('refresh-access-token', async (event, refreshToken) => {
+    try {
+        // Attach the refresh token to the client
+        oauth2Client.setCredentials({ refresh_token: refreshToken });
+
+        // Request a new access token
+        const { credentials } = await oauth2Client.refreshAccessToken();
+        // OR with newer googleapis versions:
+        // const { credentials } = await oauth2Client.getAccessToken();
+
+        // Send it back to the renderer
+        event.sender.send('access-token-refreshed', credentials.access_token);
+    } catch (error) {
+        console.error("Failed to refresh token:", error);
+        event.sender.send('access-token-refreshed', null);
+    }
+});
 
 
 // Create an Express server to handle OAuth 2.0 redirect
@@ -246,14 +272,19 @@ app2.get('/', async (req, res) => {
         try {
             const { tokens } = await oauth2Client.getToken(code);
             oauth2Client.setCredentials(tokens);
-            console.log("Authenticated successfully!", tokens);
-            res.send('Authentication Successful!');
-            console.log(tokens['access_token'])
-            win.webContents.send("access-token", tokens['access_token']);
+            //console.log("Authenticated successfully!", tokens);
+            res.send('<script>window.close()</script>');
+            //console.log(tokens['access_token'])
+
+            win.webContents.send("auth-tokens", {
+                access_token: tokens.access_token,
+                refresh_token: tokens.refresh_token  // <- refresh token is here
+            });
+
             dialog.showMessageBox({ type: "info", message: "Authentication Successful!" });
         } catch (error) {
             console.error("Error obtaining token:", error);
-            res.send('Authentication Failed!');
+            res.send('<script>window.close()</script>');
             dialog.showMessageBox({ type: "error", message: "Authentication Failed!" });
         }
     }

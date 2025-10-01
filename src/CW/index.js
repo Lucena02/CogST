@@ -29,6 +29,7 @@ function resizeWindow() {
 let isExpanded = true;
 let flag = 0;
 let passoIndex = 1;
+window.finishedCW = false;
 
 
 function addNewForm(flag) {
@@ -207,7 +208,7 @@ function executeWalkthrough(indexPasso, flag) {
             div.id = "botoes" + indexPasso
             if (flag == 0) {
                 div.innerHTML = `
-                <button onclick="backWalkthrough(${indexPasso}, ${flag})" class="botao">Retroceder</button>
+                <button onclick="backWalkthrough(${indexPasso}, ${flag})" class="botao">Back</button>
                 `;
 
                 // document.getElementById("botoesTesteRetroceder").style.display = "none"
@@ -215,8 +216,8 @@ function executeWalkthrough(indexPasso, flag) {
             }
             else {
                 div.innerHTML = `
-                <button onclick="backWalkthrough(${indexPasso}, ${flag})" class="botao">Retroceder</button>
-                <button onclick="executeWalkthrough(${indexPasso}, ${flag})" class="botao" id="avançar">Avançar</button>
+                <button onclick="backWalkthrough(${indexPasso}, ${flag})" class="botao">Back</button>
+                <button onclick="executeWalkthrough(${indexPasso}, ${flag})" class="botao" id="avançar">Next</button>
                 `;
             }
 
@@ -275,17 +276,17 @@ function executeWalkthrough(indexPasso, flag) {
         else {
             iframe4.style.display = "flex"
         }
-        avançar.innerHTML = "Acabar";
+        avançar.innerHTML = "Finish";
         state += 1
     }
     else if (state == 5) {
         timeStamps["passo" + indexPasso] = (Date.now() - timeInit) / 1000
         timeInit = null
-        alert(JSON.stringify(timeStamps["passo" + indexPasso]))
+        //alert(JSON.stringify(timeStamps["passo" + indexPasso]))
         iframe4.style.display = "none"
         passos.style.display = "flex"
         botoes.style.display = "none"
-        avançar.innerHTML = "Avançar"
+        avançar.innerHTML = "Next"
         botoesIndex.style.display = "none"
         document.getElementById("passoDesc" + indexPasso).style.textDecoration = "line-through";
         state = 0
@@ -332,7 +333,7 @@ function backWalkthrough(indexPasso) {
     if (state == 5) {
         iframe3.style.display = "flex"
         iframe4.style.display = "none"
-        avançar.innerHTML = "Avançar";
+        avançar.innerHTML = "Next";
     }
     state -= 1;
 }
@@ -422,7 +423,7 @@ function writeStats(data, url) {
                 alert("Error creating sheet:" + error.message);
             });
         }).catch(error => {
-            alert("Erro a verificar se uma spread existe")
+            alert("Erro a verificar se uma spread existe: " + JSON.stringify(error))
         });
     });
 }
@@ -525,16 +526,16 @@ function fillSheet(data, spreadsheetId) {
     const sheetName = localStorage.getItem('nome_user'); // Get the sheet name
     const range = `${sheetName}!A1:F${tamanho}`;
     const valueInputOption = "RAW";
-    alert(JSON.stringify(data, null, 2));
+    //alert(JSON.stringify(data, null, 2));
 
     const values = [
         [
             "",
-            "O utilizador vai \ntentar executar a \nação correta?",
-            "O utilizador percebe \nque a ação correta \nestá disponível?",
-            "O utilizador associará\n a ação correta com\n o resultado esperado?",
-            "O utilizador receberá\n feedback adequado e\n perceberá que está\n a avançar na sua tarefa?",
-            "Tempo a avaliar (s)"
+            "Will users be trying\nto produce whatever effect\nthe action has?",
+            "Will users see the\ncontrol for the action?",
+            "Once users find the\ncontrol, will they recognize\nthat it produces the\neffect they want?",
+            "Will users understand the\nfeedback they receive so\nthat they can go on to\nthe next action with confidence?",
+            "Time to evaluate (s)"
         ]
     ];
     Object.keys(data).forEach(key => {
@@ -543,14 +544,14 @@ function fillSheet(data, spreadsheetId) {
             let array = []
             array.push(passo["q0"]["passoDescricao"])
             for (j = 1; j <= 4; j++) {
-                if (passo["q" + j]["problema"] == "" || passo["q" + j]["problema"] == "Sim") {
+                if (passo["q" + j]["problema"] == "" || passo["q" + j]["problema"] == "Yes") {
                     array.push(
-                        `Sim\nComentários: ${passo["q" + j]["comentarios"]}`
+                        `Yes\nComments: ${passo["q" + j]["comentarios"]}`
                     );
                 }
                 else {
                     array.push(
-                        `Não (Severidade: ${passo["q" + j]["severidade"]})\nComentários: ${passo["q" + j]["comentarios"]}`
+                        `No (Severity: ${passo["q" + j]["severidade"]})\nComments: ${passo["q" + j]["comentarios"]}`
                     );
                 }
 
@@ -565,8 +566,8 @@ function fillSheet(data, spreadsheetId) {
         }
 
     });
-    alert(JSON.stringify(timeStamps, null, 2));
-    alert(JSON.stringify(values, null, 2));
+    //alert(JSON.stringify(timeStamps, null, 2));
+    //alert(JSON.stringify(values, null, 2));
     const body = { values: values };
 
     // First, update cell values
@@ -583,7 +584,7 @@ function fillSheet(data, spreadsheetId) {
         document.getElementById("spinner").style.display = "none"
         document.getElementById("textoLoading").innerHTML = "CW executado com sucesso!"
         document.getElementById("loadingDone").style.display = "flex"
-
+        window.parent.finishedCW = true
         // Verificar se o relatorio existe
         // checkExist("Relatorio", spreadsheetId).then((response) => {
         //     // alert(response)
@@ -651,19 +652,19 @@ function applyFormatting(spreadsheetId, sheetName) {
 
 
 function cellToSeveridade(cell) {
-    const regex = /\(Severidade: ([\w\s]+)\)/;
+    const regex = /\(Severity: ([\w\s]+)\)/;
     const match = cell.match(regex);
     if (match && match[1]) {
         switch (match[1]) {
-            case "Muito Pequena":
+            case "Very little":
                 return 1
-            case "Pequena":
+            case "Little":
                 return 2
             case "Normal":
                 return 3
-            case "Grave":
+            case "Serious":
                 return 4
-            case "Muito Grave":
+            case "Very serious":
                 return 5
         }
     }
@@ -673,7 +674,7 @@ function cellToSeveridade(cell) {
 }
 
 function getComentario(cell) {
-    const regex = /Comentários: (.*)/;
+    const regex = /Comments: (.*)/;
     const match = cell.match(regex);
     if (match && match[1]) {
         return match[1]
@@ -725,7 +726,7 @@ async function fillRelatorio(sheetID) {
                 tempo[nomePasso] += Number(normalizedValue)
 
                 for (let j = 1; j < 5; j++) {
-                    if (sheet[i][j].startsWith("Não")) {
+                    if (sheet[i][j].startsWith("No")) {
                         informacoes[sheet[i][0]][j - 1] += 1
                         severidade[sheet[i][0]][j - 1] += cellToSeveridade(sheet[i][j])
                     }
@@ -756,7 +757,7 @@ async function fillRelatorio(sheetID) {
     })
 
     //alert("Severidade Média: " + JSON.stringify(severidade))
-    document.getElementById("textoLoading").innerHTML = "A resumir comentários..."
+    document.getElementById("textoLoading").innerHTML = "Resuming comments..."
     //Resumir os comentarios todos
 
     window.electronAPI.send("resumir-comentarios", comentarios)
@@ -791,18 +792,18 @@ function fillRelatorioAux(data, severidade, comentarios, tempo, score, spreadshe
     const values = [
         [
             "",
-            "O utilizador vai \ntentar executar a \nação correta?",
-            "O utilizador percebe \nque a ação correta \nestá disponível?",
-            "O utilizador associará\n a ação correta com\n o resultado esperado?",
-            "O utilizador receberá\n feedback adequado e\n perceberá que está\n a avançar na sua tarefa?",
+            "Will users be trying\nto produce whatever effect\nthe action has?",
+            "Will users see the\ncontrol for the action?",
+            "Once users find the\ncontrol, will they recognize\nthat it produces the\neffect they want?",
+            "Will users understand the\nfeedback they receive so\nthat they can go on to\nthe next action with confidence?",
             "Score",
-            "Tempo Médio por Avaliador"
+            "Average Time per Evaluator"
         ]
     ];
 
     Object.keys(data).forEach(key => {
         for (let i = 0; i < 4; i++) {
-            let string = "Problemas: " + (data[key][i]).toString() + "\nSeveridade Média - " + (severidade[key][i]).toString() + "\n"
+            let string = "Problems: " + (data[key][i]).toString() + "\nAverage Severity - " + (severidade[key][i]).toString() + "\n"
             if (comentarios != null && comentarios[key][i] != undefined) {
                 string += comentarios[key][i].toString()
             }
@@ -829,7 +830,7 @@ function fillRelatorioAux(data, severidade, comentarios, tempo, score, spreadshe
         applyFormatting(spreadsheetId, "Relatorio");
         applyHeatmap(spreadsheetId, "Relatorio")
         document.getElementById("spinner").style.display = "none"
-        document.getElementById("textoLoading").innerHTML = "Relatório criado com sucesso!"
+        document.getElementById("textoLoading").innerHTML = "Report created successfully!"
         document.getElementById("loadingDone").style.display = "flex"
     }).catch(error => {
         alert("Erro ao preencher o relatorio:" + error.message);
@@ -891,7 +892,7 @@ function applyHeatmap(spreadsheetId, sheetName) {
             resource: { requests: requests }
         });
     }).then((response) => {
-        alert("done")
+        //alert("done")
         console.log("Heatmap applied successfully:", response);
     }).catch(error => {
         console.error("Error applying heatmap:", error);
@@ -901,15 +902,29 @@ function applyHeatmap(spreadsheetId, sheetName) {
 
 
 async function retrocedeCW2() {
+    if (window.finishedCW == false) {
+        const result = await window.electronAPI.showConfirmationDialog({
+            title: "Confirmar Retrocesso",
+            message: "Are you sure you wish to go back? All progress will be lost",
+            buttons: ["Cancel", "Yes"]
+        });
 
-    const result = await window.electronAPI.showConfirmationDialog({
-        title: "Confirmar Retrocesso",
-        message: "Tem a certeza que quer retroceder? Todo o progresso será perdido. (A não ser que tenha finalizado o CW)",
-        buttons: ["Cancelar", "Sim"]
-    });
-
-    if (result === 1) {
+        if (result === 1) {
+            window.electronAPI.send("start-main-app");
+        }
+    }
+    else {
         window.electronAPI.send("start-main-app");
+    }
+}
+
+
+function getHelp(int) {
+    if (int == 1) {
+        parent.window.electronAPI.send("getHelp")
+    }
+    else {
+        window.electronAPI.send("getHelp")
     }
 }
 
@@ -931,13 +946,13 @@ function importRelatorio() {
 
                 document.getElementById("contentFrame").style.display = "none"
                 document.getElementById("loading").style.display = "flex"
-                document.getElementById("textoLoading").innerHTML = "A recolher todas as respostas..."
+                document.getElementById("textoLoading").innerHTML = "Gathering all answers..."
 
 
                 const token = localStorage.getItem("access_token");
                 const username = localStorage.getItem('nome_user')
                 loadGapiWithAuth(token).then(() => {
-                    document.getElementById("textoLoading").innerHTML = "A autenticar o utilizador na google..."
+                    document.getElementById("textoLoading").innerHTML = "Authenticating user..."
                     checkExist("Relatorio", sheet_id).then((response) => {
                         fillRelatorio(sheet_id)
                     })
@@ -959,6 +974,6 @@ function importRelatorio() {
 
 
     } else {
-        document.getElementById("error").innerHTML = "Nenhum arquivo importado";
+        document.getElementById("error").innerHTML = "No file imported";
     }
 }

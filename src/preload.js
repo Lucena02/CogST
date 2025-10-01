@@ -14,24 +14,32 @@ contextBridge.exposeInMainWorld("electronAPI", {
     runAxeTest: (url) => ipcRenderer.invoke("medir-acesibilidade", url),
     runRespTest: (url) => ipcRenderer.invoke("medir-responsividade", url),
     showConfirmationDialog: (options) => ipcRenderer.invoke('show-confirmation-dialog', options),
-    onAccessToken: (callback) => ipcRenderer.on('access-token', callback),
+    onAccessToken: (callback) => ipcRenderer.on('auth-tokens', callback),
     doLogin: () => ipcRenderer.send("login"),
     updateWindowSize: (width) => ipcRenderer.send("update-window-width", width),
     getEnv: () => ({
         WIDTH: process.env.WIDTH,
         HEIGHT: process.env.HEIGHT
-    })
+    }),
+
+    refreshAccessToken: (refreshToken) => ipcRenderer.send('refresh-access-token', refreshToken),
+    onAccessTokenRefreshed: (callback) => {
+        ipcRenderer.once('access-token-refreshed', (event, newToken) => {
+            callback(newToken);
+        });
+    }
 });
 
 
-ipcRenderer.on('access-token', async (event, accessToken) => {
-    if (accessToken) {
-        window.localStorage.setItem('access_token', accessToken);
+ipcRenderer.on('auth-tokens', async (event, tokens) => {
+    if (tokens) {
+        window.localStorage.setItem('access_token', tokens.access_token);
+        window.localStorage.setItem('refresh_token', tokens.refresh_token);
 
         try {
             const response = await fetch("https://www.googleapis.com/oauth2/v2/userinfo", {
                 headers: {
-                    "Authorization": `Bearer ${accessToken}`
+                    "Authorization": `Bearer ${tokens.access_token}`
                 }
             });
 

@@ -22,17 +22,17 @@
                     <div class="cogst">
                         CogST
                     </div>
-                    <a href="#" class="help" title="Help">
+                    <button onclick="getHelp(2)" class="help" title="Help">
                         <i data-lucide="help-circle"></i>
-                    </a>
+                    </button>
                 </div>
 
                 <div class="form-section">
-                    <h3 class="section-title">Definir CW</h3>
+                    <h3 class="section-title">Create CW</h3>
 
                     <form id="form-inicio" class="cw-form">
                         <div class="form-group">
-                            <label for="tarefa">Tarefa a realizar</label>
+                            <label for="tarefa">Task to do</label>
                             <textarea id="tarefa" rows="3"></textarea>
                         </div>
 
@@ -42,7 +42,7 @@
                         </div>
 
                         <div class="form-group">
-                            <label for="persona">Definir Persona</label>
+                            <label for="persona">Define Persona</label>
                             <textarea id="persona" rows="1"></textarea>
                         </div>
                     </form>
@@ -50,11 +50,11 @@
                     <div class="navigation-buttons">
                         <button onclick="retrocederCW()" class="btn btn-secondary">
                             <i data-lucide="arrow-left"></i>
-                            Retroceder
+                            Back
                         </button>
 
                         <button onclick="toPassos()" class="btn btn-primary">
-                            Definir passos
+                            Define steps
                             <i data-lucide="arrow-right"></i>
                         </button>
                     </div>
@@ -66,14 +66,14 @@
             <div id="botoesTesteRetroceder" class="back-buttons">
                 <button onclick="retrocedePassos()" class="btn btn-secondary">
                     <i data-lucide="arrow-left"></i>
-                    Definir CW
+                    Create CW
                 </button>
             </div>
 
             <div id="botaoFim" class="export-button">
                 <button onclick="exportPassos()" class="btn btn-success">
                     <i data-lucide="save"></i>
-                    Salvar e Exportar
+                    Save & Export
                 </button>
             </div>
         </div>

@@ -6,7 +6,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Overlay</title>
     <link rel="stylesheet" href="q.css"> <!-- Linking external CSS -->
-
+    <script src="https://unpkg.com/lucide@latest"></script>
 </head>
 
 <body>
@@ -17,40 +17,40 @@
             <div class="cogst">
                 CogST
             </div>
-            <a href="" class="help">
-                ?
-            </a>
+            <button type="button" onclick="getHelp(1)" class="help" title="Help">
+                <i data-lucide="help-circle" class="icon"></i>
+            </button>
         </div>
         <div class="pergunta">
-            2º - O utilizador percebe que a ação correta está disponível?
+            2º - Will users see the control for the action?
         </div>
 
         <br>
 
         <div>
-            <label>Não</label>
-            <input type="radio" value="Não" name="problema" id="problema-nao">
+            <label>No</label>
+            <input type="radio" value="No" name="problema" id="problema-nao">
             <label>|</label>
-            <input type="radio" value="Sim" name="problema" id="problema-sim">
-            <label>Sim</label>
+            <input type="radio" value="Yes" name="problema" id="problema-sim">
+            <label>Yes</label>
         </div>
 
         <br>
 
         <div class="severidade" id="severidade">
-            <label>Gravidade</label>
+            <label>Severity</label>
             <select id="gravidade">
                 <option>-</option>
-                <option>Muito Pequena</option>
-                <option>Pequena</option>
+                <option>Very little</option>
+                <option>Little</option>
                 <option>Normal</option>
-                <option>Grave</option>
-                <option>Muito Grave</option>
+                <option>Serious</option>
+                <option>Very serious</option>
             </select>
         </div>
 
         <br>
-        <label>Comentários</label>
+        <label>Comments</label>
         <textarea id="comentarios" rows="4" cols="26"></textarea>
         <br>
     </form>

@@ -1,0 +1,259 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>CogST Help Page</title>
+    <link rel="stylesheet" href="help.css">
+</head>
+
+<body>
+    <!-- Left Sidebar -->
+    <div class="sidebar">
+        <div class="sidebar-header">
+            <h2>CogST</h2>
+        </div>
+        <nav class="sidebar-nav">
+            <button class="nav-item active" onclick="showContent(1, this)">Create Cognitive Walkthrough</button>
+            <button class="nav-item" onclick="showContent(2, this)">Fill a Cognitive Walkthrough</button>
+            <button class="nav-item nav-item-sub" onclick="showContent(3, this)">Will users be trying to produce
+                whatever effect the action has?</button>
+            <button class="nav-item nav-item-sub" onclick="showContent(4, this)">Will users see the control (button,
+                menu, switch, etc.) for the action?</button>
+            <button class="nav-item nav-item-sub" onclick="showContent(5, this)">Once users find the control, will they
+                recognize that it produces the effect they want?</button>
+            <button class="nav-item nav-item-sub" onclick="showContent(6, this)">After the action is taken, will users
+                understand the feedback they receive so that they can go on to the next action with confidence?</button>
+            <button class="nav-item" onclick="showContent(7, this)">Generate Report</button>
+            <button class="nav-item" onclick="showContent(8, this)">Acessibility Testing</button>
+            <button class="nav-item" onclick="showContent(9, this)">Responsiveness Testing</button>
+        </nav>
+    </div>
+
+    <!-- Main Content Area -->
+    <div class="main-content">
+        <header class="content-header">
+            <h1 id="content-title">Create Cognitive Walkthrough</h1>
+        </header>
+
+        <main class="content-body">
+            <!-- Content Section 1 -->
+            <div id="content-1" class="content-section active">
+                <p class="content-description">
+                    In the CogST main menu, select the option **"Define CW"** to start setting up the Walkthrough.
+                </p>
+                <div class="content-grid">
+                    <div class="content-card">
+                        <h3>1 - Fill in the Initial Parameters</h3>
+                        <p><strong>Task to Perform: </strong>A brief description of the final objective of the task to
+                            be carried out.</p>
+                        <p><strong>Google Sheets Link: </strong>Link to the Google Sheet where the results will be sent.
+                            The link must have active editing permissions.</p>
+                        <p><strong>Define Persona: </strong>Specify the profile of the target audience or the fictional
+                            character representing the person for whom the task will be performed.
+                            The persona should include basic information such as approximate age, profession/occupation,
+                            goals, main difficulties, and the expected communication style.</p>
+                    </div>
+                    <div class="content-card">
+                        <h3>2 - Create Steps</h3>
+                        <p>Each step should represent a stage required to complete the task defined in the previous
+                            section.</p>
+                        <p>Click the <strong>"+"</strong> in the top-right corner to create a new step.</p>
+                        <p>For each created step, click the <strong>"→"</strong> icon to edit the <strong>step
+                                name</strong>,
+                            making it clear what the person completing the CW needs to do to accomplish the defined
+                            task.</p>
+                    </div>
+                    <div class="content-card">
+                        <h3>3 - Export CW</h3>
+                        <p>After completing the definition of the CW and its respective steps, you can export the CW by
+                            clicking
+                            the green button at the bottom of the page <strong>"Save and Export"</strong>.
+                            This JSON file is important because <strong>it will be required by the evaluators to fill in
+                                the CW.</strong></p>
+                    </div>
+                </div>
+            </div>
+
+
+            <!-- Content Section 2 -->
+            <div id="content-2" class="content-section">
+                <p class="content-description">
+                    In the CogST main menu, select the option **"Fill CW"** to start completing a previously defined
+                    Walkthrough.
+                </p>
+                <div class="content-grid">
+                    <div class="content-card">
+                        <h3>1 - Import CW</h3>
+                        <p>Select the Walkthrough file that needs to be completed and click the
+                            <strong>"Import and Start"</strong> button.
+                        </p>
+                    </div>
+                    <div class="content-card">
+                        <h3>2 - Fill the Steps</h3>
+                        <p>For each step, answer the questions related to the Cognitive Walkthrough
+                            (You can select a step by clicking the **"→"** icon).</p>
+                    </div>
+                    <div class="content-card">
+                        <h3>3 - Finish CW</h3>
+                        <p>After answering all the steps, click the <strong>green button</strong> at the bottom of the
+                            page
+                            **"Save and Export"**.</p>
+                    </div>
+                </div>
+            </div>
+
+
+            <!-- Content Section 3 -->
+            <div id="content-3" class="content-section">
+                <p class="content-description">
+                    Will users be trying to produce whatever effect the action has?
+                </p>
+                <div class="content-grid">
+                    <div class="content-card">
+                        <h3>Description</h3>
+                        <p>The user must have a clear intention or motivation to perform the action.
+                            This means the interface should guide the user toward wanting the outcome,
+                            making it obvious why the action is useful or necessary.
+                            If the purpose of the action is unclear, users may not attempt it at all.</p>
+                    </div>
+                </div>
+            </div>
+
+
+            <!-- Content Section 4 -->
+            <div id="content-4" class="content-section">
+                <p class="content-description">
+                    Will users see the control (button, menu, switch, etc.) for the action?
+                </p>
+                <div class="content-grid">
+                    <div class="content-card">
+                        <h3>Description</h3>
+                        <p>Ensure that the actions required to complete the step are visible and accessible.</p>
+                    </div>
+                    <div class="content-card">
+                        <h3 style="color: #b40000">Bad Example</h3>
+                        <img src="../../public/img/exemploCW2.png">
+                        <p><strong>Step: Click the "Quizzes" button</strong></p>
+                        <p>In the image and task shown above, the "Quizzes" button is not fully visible to the user,
+                            which may cause difficulties in completing the action.</p>
+                    </div>
+                </div>
+            </div>
+
+
+            <!-- Content Section 5 -->
+            <div id="content-5" class="content-section">
+                <p class="content-description">
+                    Once users find the control, will they recognize that it produces the effect they want?
+                </p>
+                <div class="content-grid">
+                    <div class="content-card">
+                        <h3>Description</h3>
+                        <p>The user, upon seeing the action, must understand that it leads to the desired result.
+                            This is achieved through clear and visible icons/descriptions.</p>
+                    </div>
+                    <div class="content-card">
+                        <h3>Example</h3>
+                        <p><strong>Step: Create the Report</strong></p>
+                        <p>If the button is labeled “Export Report,” the user understands that they will obtain the
+                            file.
+                            However, if it is labeled only “Export,” they may not immediately associate it with the
+                            report,
+                            which could cause confusion when completing the step.</p>
+                    </div>
+                </div>
+            </div>
+
+
+            <!-- Content Section 6 -->
+            <div id="content-6" class="content-section">
+                <p class="content-description">
+                    After the action is taken, will users understand the feedback they receive so that they can proceed
+                    to the next action with confidence?
+                </p>
+                <div class="content-grid">
+                    <div class="content-card">
+                        <h3>Description</h3>
+                        <p>After performing an action, a notification or some indication should appear to show that
+                            the action is being processed or was successful. If nothing happens, the user may feel lost.
+                        </p>
+                    </div>
+                    <div class="content-card">
+                        <h3 style="color: #058b00">Good Example</h3>
+                        <img src="../../public/img/exemploCW4.png">
+                        <p>In the image above, we see an example of how users can be informed whether their action
+                            was successful or not.</p>
+                    </div>
+                </div>
+            </div>
+
+
+
+            <!-- Content Section 7 -->
+            <div id="content-7" class="content-section">
+                <p class="content-description">
+                    To finalize the CW, it is necessary to create a report based on the aggregated results.
+                </p>
+                <div class="content-grid">
+                    <div class="content-card">
+                        <h3>Create the Report</h3>
+                        <p>Click the "Create Report" button on the home page and select the JSON file corresponding to
+                            the desired CW.</p>
+                    </div>
+                    <div class="content-card">
+                        <h3>View the Results</h3>
+                        <p>In the Google Sheet provided as a parameter in the "Create CW" step,
+                            a new sheet named "Report" will be generated containing relevant information from the
+                            completed CW.</p>
+                    </div>
+                </div>
+            </div>
+
+        </main>
+    </div>
+
+    <script>
+        const contentTitles = {
+            1: 'Criar Cognitive Walkthrough',
+            2: 'Fill a Cognitive Walkthrough',
+            3: 'Fill a Cognitive Walkthrough',
+            4: 'Fill a Cognitive Walkthrough',
+            5: 'Fill a Cognitive Walkthrough',
+            6: 'Fill a Cognitive Walkthrough',
+            7: 'Generate report'
+        };
+
+        function showContent(sectionId, clickedButton) {
+            // Hide all content sections
+            const allSections = document.querySelectorAll('.content-section');
+            allSections.forEach(section => {
+                section.classList.remove('active');
+            });
+
+            // Remove active class from all nav items
+            const allNavItems = document.querySelectorAll('.nav-item');
+            allNavItems.forEach(item => {
+                item.classList.remove('active');
+            });
+
+            // Show selected content section
+            const targetSection = document.getElementById(`content-${sectionId}`);
+            if (targetSection) {
+                targetSection.classList.add('active');
+            }
+
+            // Add active class to clicked nav item
+            clickedButton.classList.add('active');
+
+            // Update header title
+            const titleElement = document.getElementById('content-title');
+            if (titleElement) {
+                titleElement.textContent = contentTitles[sectionId];
+            }
+        }
+    </script>
+</body>
+
+</html>

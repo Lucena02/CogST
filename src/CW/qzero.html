@@ -6,7 +6,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Overlay</title>
     <link rel="stylesheet" href="q.css"> <!-- Linking external CSS -->
-
+    <script src="https://unpkg.com/lucide@latest"></script>
 </head>
 
 <body>
@@ -17,14 +17,14 @@
             <div class="cogst">
                 CogST
             </div>
-            <a href="" class="help">
-                ?
-            </a>
+            <button type="button" onclick="getHelp(1)" class="help" title="Help">
+                <i data-lucide="help-circle" class="icon"></i>
+            </button>
         </div>
 
         <br>
 
-        <label>Descrição do Passo</label>
+        <label>Step Description</label>
         <textarea id="passoDesc" rows="5" cols="26"></textarea>
         <br>
     </form>
