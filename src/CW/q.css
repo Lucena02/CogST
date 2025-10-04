@@ -131,3 +131,112 @@ textarea {
 .help:hover {
     background-color: #fecaca;
 }
+
+/* General form styling */
+div {
+    margin-bottom: 3px;
+    font-family: Arial, sans-serif;
+    font-size: 14px;
+    color: #333;
+}
+
+/* Radio button group */
+.problema {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+}
+
+.problema label {
+    display: flex;
+    align-items: center;
+    cursor: pointer;
+}
+
+.problema input[type="radio"] {
+    margin-right: 0.3rem;
+}
+
+/* Separator line */
+.problema span {
+    color: #aaa;
+}
+
+/* Severity dropdown */
+.severidade label {
+    margin-right: 0.5rem;
+    font-weight: 600;
+}
+
+.severidade select {
+    padding: 0.3rem 0.5rem;
+    border: 1px solid #ccc;
+    border-radius: 6px;
+    font-size: 14px;
+}
+
+/* Comments textarea */
+.comentarios label {
+    display: block;
+    margin-bottom: 0.3rem;
+    font-weight: 600;
+}
+
+.comentarios textarea {
+    width: 90%;
+    max-width: 300px;
+    padding: 0.5rem;
+    border: 1px solid #ccc;
+    border-radius: 6px;
+    resize: vertical;
+    font-size: 14px;
+    line-height: 1.4;
+}
+
+.btn {
+    height: 80%;
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    padding: 8px 12px;
+    border-radius: 4px;
+    font-family: "Roboto", sans-serif;
+    font-size: 14px;
+    font-weight: 500;
+    cursor: pointer;
+    transition: background-color var(--transition-speed), border-color var(--transition-speed);
+    border: 1px solid transparent;
+}
+
+.btn svg {
+    width: 16px;
+    height: 16px;
+}
+
+.btn-success {
+    background-color: #10b981;
+    color: white;
+}
+
+.btn-success:hover {
+    background-color: #059669;
+}
+
+.btn-primary {
+    background-color: var(--primary-color);
+    color: white;
+}
+
+.btn-primary:hover {
+    background-color: var(--primary-hover);
+}
+
+.btn-secondary {
+    background-color: var(--secondary-color);
+    color: var(--text-color);
+    border-color: var(--border-color);
+}
+
+.btn-secondary:hover {
+    background-color: var(--secondary-hover);
+}

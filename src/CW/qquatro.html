@@ -28,19 +28,23 @@
 
         <br>
 
-        <div>
-            <label>No</label>
-            <input type="radio" value="No" name="problema" id="problema-nao">
-            <label>|</label>
-            <input type="radio" value="Yes" name="problema" id="problema-sim">
-            <label>Yes</label>
+        <div class="problema">
+            <label>
+                <input type="radio" value="No" name="problema" id="problema-nao">
+                No
+            </label>
+            <span>|</span>
+            <label>
+                <input type="radio" value="Yes" name="problema" id="problema-sim">
+                Yes
+            </label>
         </div>
 
         <br>
 
         <div class="severidade" id="severidade">
-            <label>Severity</label>
-            <select id="gravidade">
+            <label for="gravidade">Severity</label>
+            <select id="gravidade" name="gravidade">
                 <option>-</option>
                 <option>Very little</option>
                 <option>Little</option>
@@ -51,9 +55,12 @@
         </div>
 
         <br>
-        <label>Comments</label>
-        <textarea id="comentarios" rows="4" cols="26"></textarea>
-        <br>
+
+        <div class="comentarios">
+            <label for="comentarios">Comments</label>
+            <textarea id="comentarios" name="comentarios" rows="4" cols="26"></textarea>
+        </div>
+
     </form>
     <script src="index.js"></script>
     <script src="qum.js"></script>

@@ -208,7 +208,7 @@ function executeWalkthrough(indexPasso, flag) {
             div.id = "botoes" + indexPasso
             if (flag == 0) {
                 div.innerHTML = `
-                <button onclick="backWalkthrough(${indexPasso}, ${flag})" class="botao">Back</button>
+                <button onclick="backWalkthrough(${indexPasso}, ${flag})" class="btn btn-secondary">Back</button>
                 `;
 
                 // document.getElementById("botoesTesteRetroceder").style.display = "none"
@@ -216,8 +216,8 @@ function executeWalkthrough(indexPasso, flag) {
             }
             else {
                 div.innerHTML = `
-                <button onclick="backWalkthrough(${indexPasso}, ${flag})" class="botao">Back</button>
-                <button onclick="executeWalkthrough(${indexPasso}, ${flag})" class="botao" id="avançar">Next</button>
+                <button onclick="backWalkthrough(${indexPasso}, ${flag})" class="botao btn btn-secondary">Back</button>
+                <button onclick="executeWalkthrough(${indexPasso}, ${flag})" class="botao btn btn-primary" id="avançar">Next</button>
                 `;
             }
 
@@ -581,10 +581,7 @@ function fillSheet(data, spreadsheetId) {
         applyFormatting(spreadsheetId, sheetName);
         //applyConditionalFormatting(spreadsheetId, sheetName)
 
-        document.getElementById("spinner").style.display = "none"
-        document.getElementById("textoLoading").innerHTML = "CW executado com sucesso!"
-        document.getElementById("loadingDone").style.display = "flex"
-        window.parent.finishedCW = true
+
         // Verificar se o relatorio existe
         // checkExist("Relatorio", spreadsheetId).then((response) => {
         //     // alert(response)
@@ -645,6 +642,10 @@ function applyFormatting(spreadsheetId, sheetName) {
 
     }).then((response) => {
         console.log("Formatting applied successfully:", response);
+        document.getElementById("spinner").style.display = "none"
+        document.getElementById("textoLoading").innerHTML = "CW executado com sucesso!"
+        document.getElementById("loadingDone").style.display = "flex"
+        window.parent.finishedCW = true
     }).catch(error => {
         console.error("Error applying formatting:", error);
     });
@@ -812,7 +813,7 @@ function fillRelatorioAux(data, severidade, comentarios, tempo, score, spreadshe
         data[key].unshift(key)
         data[key].push(Number(score[key]));
         data[key].push(Number(tempo[key]));
-        alert(JSON.stringify(data[key], null, 2))
+        //alert(JSON.stringify(data[key], null, 2))
         values.push(data[key])
     })
 

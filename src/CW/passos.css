@@ -12,6 +12,23 @@
     font-style: normal;
 }
 
+:root {
+    --tab-width: 320px;
+    --tab-height: 480px;
+    --collapsed-width: 40px;
+    --primary-color: #3b82f6;
+    --primary-hover: #2563eb;
+    --secondary-color: #e2e8f0;
+    --secondary-hover: #cbd5e1;
+    --success-color: #10b981;
+    --success-hover: #059669;
+    --bg-color: #f8fafc;
+    --border-color: #d1d5db;
+    --text-color: #1f2937;
+    --error-color: #ef4444;
+    --transition-speed: 0.3s;
+}
+
 html {
     height: 100%;
 }
@@ -74,6 +91,18 @@ body {
 
 .botaoPreencher {
     height: 50%;
+    border-radius: 4px;
+    font-family: "Roboto", sans-serif;
+    font-size: 14px;
+    font-weight: 500;
+    cursor: pointer;
+    transition: background-color var(--transition-speed), border-color var(--transition-speed);
+    border: 1px solid #ccc;
+}
+
+.botaoPreencher:hover {
+    background-color: #e0e0e0;
+    border-color: #bbb;
 }
 
 .cogContainer {
@@ -115,7 +144,7 @@ body {
 }
 
 .botoesContainer {
-    height: 20%;
+    height: 30%;
     display: flex;
     justify-content: center;
 }
@@ -124,7 +153,7 @@ body {
     display: flex;
     justify-content: space-between;
     width: 85%;
-    height: 25px;
+    height: 35px;
 }
 
 
@@ -181,6 +210,27 @@ input[type='file'] {
 .btn-success:hover {
     background-color: #059669;
 }
+
+.btn-primary {
+    background-color: var(--primary-color);
+    color: white;
+}
+
+.btn-primary:hover {
+    background-color: var(--primary-hover);
+}
+
+.btn-secondary {
+    background-color: var(--secondary-color);
+    color: var(--text-color);
+    border-color: var(--border-color);
+}
+
+.btn-secondary:hover {
+    background-color: var(--secondary-hover);
+}
+
+
 
 .topotopo {
     display: flex;
